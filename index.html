@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+ <head>
+    <meta charset="utf-8" />
+    <title>Video Game</title>                            <!--Page title, invisible on browser page-->
+    <link rel="stylesheet" href="styles.css" />                 <!--Reference to external CSS file-->
+ </head>
+
+ <body>
+  <header>
+   <h1>Video Game</h1>                                     <!--Page title, visible on browser page-->
+  </header>
+
+  <h2>Chicken Crossing</h2>
+
+  <div class = "Stage">
+   <canvas id = "canvas"></canvas>
+  </div>
+
+  <p>Don't worry about the <em>why</em>, just get to the other side!
+     Although the <em>why</em> should become obvious very soon.<br><br>
+     <strong><u>Controls:</u></strong><br><br>
+     <strong>Left</strong> and <strong>Right</strong> arrow keys for sideways motion<br>
+     <strong>Spacebar</strong> to jump<br>
+     <strong>Up</strong> arrow key when airborne to flap to gain altitude<br><br>
+     Enjoy the Game
+  </p>
+
+ </body>
+
+ <script>
+
+  var gravity = 0.6; var friction = 0.7;
+
+  // Below, the image files are referenced and uploaded
+  var Background = new Image(); 
+  const X_b = [-10, -10, -10]; const Y_b = [-1100, -700, -400]; 
+  const X_bw = [1500, 1750, 10000]; const Y_bw = [1800, 2000, 1000];
+  var x_b = JSON.parse(JSON.stringify(X_b[0])); 
+  var y_b = JSON.parse(JSON.stringify(Y_b[0]));
+  // Function to render the canvas
+  function RenderCanvas() { 
+    Background.src = "BackgroundL" + Level + ".jpg";
+    ctx.drawImage(Background, x_b, y_b, X_bw[Level-1], Y_bw[Level-1])
+                          };
+
+  var Chicken = new Image(); Chicken.src = "ChickenR.gif"; // Our beloved protagonist <:-)
+  var DuckImage = []; var PigeonImage = []; var DrainImage = [];
+  var Farmer = new Image(); Farmer.src = "Farmer.gif"; // Our accursed nemesis >:-(
+
+  // A separate render is made for each instance of the map characters
+  function ImageLoad() {
+  if (Level == 1) {DuckImage = [new Image(), new Image(), new Image()]; 
+  DuckImage[0].src = "DuckR.gif"; DuckImage[1].src = "DuckR.gif"; DuckImage[2].src = "DuckR.gif";
+  PigeonImage = [new Image(), new Image(), new Image()]; 
+  PigeonImage[0].src = "Pigeon.gif"; PigeonImage[1].src = "Pigeon.gif"; 
+  PigeonImage[2].src = "Pigeon.gif";
+  DrainImage = new Image(); DrainImage.src = "Drain.gif"
+                  };
+  if (Level == 2) {DuckImage = [new Image(), new Image()]; 
+  DuckImage[0].src = "RatR.gif"; DuckImage[1].src = "FishR.gif";
+  PigeonImage = [new Image(), new Image()]; 
+  PigeonImage[0].src = "Bat.gif"; PigeonImage[1].src = "Bat.gif";
+  DrainImage = [new Image(), new Image()]; 
+  DrainImage[0].src = "Drain.gif"; DrainImage[1].src = "Drain.gif"
+                  };
+  if (Level == 3) {DuckImage = []; PigeonImage = []; DrainImage = []}                                
+                       };
+
+  // Function to render the player
+  function RenderPlayer()
+    {ctx.drawImage(Chicken, Player.x, Player.y, Player.width, Player.height)};
+  // Note: +x is right, +y is down for all coordinates
+  
+  var Level = 1; // The number specifies the map to be loaded
+
+  // These arrays will be filled in accordance with the level specifications
+  var Spawn; var Ground = []; var Platform = []; var Obstacle = []; var Duck = []; var Pigeon = []; 
+  var Water = []; var Drain = []; var Predator = []; var MapSpec = [];
+
+  function LevelLoad() {// Where the fun of level-building happens! >:-D
+    if (Level == 1) {
+      Spawn = {x: 30, y: 200};
+
+      Water[0] = {x: 3800, y: -4000, width: 100, height: 4556};
+
+      Ground[0] = {x: 0, y: 556, width: 2050, height: 40};
+      Ground[1] = {x: 2300, y: 556, width: 1700, height: 40};
+        
+      Platform[0] = {x: 500, y: 200, width: 110, height: 15};
+      Platform[1] = {x: 800, y: 230, width: 110, height: 15};
+      Platform[2] = {x: 1200, y: 30, width: 110, height: 15};
+      Platform[3] = {x: 1550, y: 406, width: 350, height: 15};
+      Platform[4] = {x: 1600, y: 511, width: 350, height: 15};
+
+      Obstacle[0] = {x: 300, y: 456, width: 50, height: 100};
+      Obstacle[1] = {x: 650, y: 406, width: 50, height: 150};
+      Obstacle[2] = {x: 1500, y: 406, width: 50, height: 150};
+      Obstacle[3] = {x: 1500, y: -124, width: 500, height: 500};
+      Obstacle[4] = {x: 1950, y: 376, width: 50, height: 150};
+      Obstacle[5] = {x: 2500, y: 300, width: 50, height: 50};
+      Obstacle[6] = {x: 2500, y: 400, width: 50, height: 50};
+      Obstacle[7] = {x: 2500, y: 500, width: 50, height: 50};
+      Obstacle[8] = {x: 2700, y: 400, width: 200, height: 156};
+      Obstacle[9] = {x: 3900, y: -4000, width: 1000, height: 4556};
+  
+      Duck[0] = {x: 1300, y: 526, x_v: -1, width: 20, height: 20};
+      Duck[1] = {x: 1750, y: 375, x_v: 1, width: 20, height: 20};
+      Duck[2] = {x: 3000, y: 300, x_v: -1, width: 100, height: 100};
+
+      Pigeon[0] = {x: 1000, y: 0, y_v: 1, width: 20, height: 20};
+      Pigeon[1] = {x: 2100, y: -100, y_v: 1, width: 20, height: 20};
+      Pigeon[2] = {x: 2400, y: 275, y_v: 1, width: 50, height: 50};
+
+      Drain[0] = {x: 3500, y: 506, width: 100, height: 50};
+
+      Predator[0] = {x: -1000, y: 10, x_v: 2.25, width: 550, height: 550};
+
+      MapSpec = [Spawn, Water, Ground, Platform, Obstacle, Duck, Pigeon, Drain, Predator]
+                    };
+
+    if (Level == 2) {
+      Spawn = []; Spawn = {x: 35, y: 42};
+
+      Water = [];
+      Water[0] = {x: 1100, y: 750, width: 1500, height: 150};
+      Water[1] = {x: 295, y: -100, width: 100, height: 140};
+
+      Ground = [];
+      Ground[0] = {x: 0, y: 1060, width: 0, height: 0};
+      Ground[1] = {x: 0, y: 40, width: 10, height: 40};
+      Ground[2] = {x: 80, y: 40, width: 2600, height: 40};
+      Ground[3] = {x: 80, y: 40, width: 2600, height: 40};
+      Ground[4] = {x: 3020, y: 40, width: 80, height: 40};
+    
+      Platform = [];
+      Platform[0] = {x: 1500, y: 735, width: 110, height: 15};
+      Platform[1] = {x: 2700, y: 500, width: 50, height: 15};
+      Platform[2] = {x: 2950, y: 300, width: 50, height: 15};
+    
+      Obstacle = [];
+      Obstacle[0] = {x: 0, y: 80, width: 10, height: 1020};
+      Obstacle[1] = {x: 80, y: 80, width: 120, height: 930};
+      Obstacle[2] = {x: 10, y: 1040, width: 1090, height: 60};
+      Obstacle[3] = {x: 300, y: 840, width: 100, height: 200};
+      Obstacle[4] = {x: 500, y: 690, width: 100, height: 350};
+      Obstacle[5] = {x: 1000, y: 690, width: 100, height: 350};
+      Obstacle[6] = {x: 160, y: 80, width: 2520, height: 420};
+      Obstacle[7] = {x: 1100, y: 900, width: 1500, height: 200};
+      Obstacle[8] = {x: 2600, y: 690, width: 400, height: 410};
+      Obstacle[9] = {x: 3020, y: 80, width: 80, height: 1020};
+      Obstacle[10] = {x: 2700, y: 40, width: 300, height: 10};
+      Obstacle[11] = {x: 10, y: 40, width: 20, height: 1000};
+      Obstacle[12] = {x: 60, y: 40, width: 20, height: 970};
+      Obstacle[13] = {x: 2680, y: 40, width: 20, height: 460};
+      Obstacle[14] = {x: 3000, y: 40, width: 20, height: 1060};
+      Obstacle[15] = {x: 395, y: -100, width: 1000, height: 140};
+      Obstacle[16] = {x: 10, y: 30, width: 60, height: 10};
+
+      Duck = [];
+      Duck[0] = {x: 900, y: 1000, x_v: -1, width: 20, height: 20};
+      Duck[1] = {x: 2000, y: 750, x_v: -1, width: 600, height: 150};
+
+      Pigeon = [];
+      Pigeon[0] = {x: 750, y: 700, y_v: 1, width: 50, height: 50};
+      Pigeon[1] = {x: 1300, y: 500, y_v: 1, width: 100, height: 100};
+
+      Drain = [];
+      Drain[0] = {x: -5, y: -10, width: 100, height: 50};
+      Drain[1] = {x: 2700, y: 40, width: 300, height: 40};
+
+      MapSpec = [];
+      MapSpec = [Spawn, Water, Ground, Platform, Obstacle, Duck, Pigeon, Drain]
+                    } 
+                    
+    if (Level == 3) {
+      Spawn = []; Spawn = {x: 30, y: 200};
+
+      Ground = []; Ground[0] = {x: 0, y: 556, width: 10000, height: 40};
+
+      Predator = []; Predator[0] = {x: -1000, y: 10, x_v: 2.7, width: 550, height: 550};
+
+      MapSpec = [];
+      MapSpec = [Spawn, Ground, Predator]
+                    }                
+                    // Gotta call it from the beginning, otherwise Level 1 won't load
+                       }; LevelLoad(); 
+
+  // The map may need to be reset and reloaded
+  var Map = JSON.parse(JSON.stringify(MapSpec));
+  /* A simple "=" assignment alone means that any changes to the copy will also carry over to
+     the original, something that should be avoided */
+
+  const Player = {x: Map[0].x, y: Map[0].y, x_v: 0, y_v: 0, jump: true, bounce: false,
+                  height: 20, width: 20, Stamina: 5, Lives: 5, Surprised: false};  
+  
+  const keys = {right: false, left: false, up: false, down: false}; // Arrow key status
+ 
+  // Function to render the map
+  function RenderMap() {for (let i = 1; i < Map.length; i++) {
+    for (let j = 0; j < Map[i].length; j++) {
+    if (i == 1) {ctx.fillStyle = "darkcyan"; 
+      if (Level == 2 && j == 0) {ctx.fillStyle = "darkslategrey"};
+      if (Level == 3) {ctx.fillStyle = "orangered"}}; 
+    if (i == 2 && Level != 3) {ctx.fillStyle = "green"};
+    if (i == 2 && Level == 3) 
+      {ctx.drawImage(Farmer, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
+    if (i == 3) {ctx.fillStyle = "brown"}; 
+    if (i == 4) {ctx.fillStyle = "yellow"; if (Level == 2) {ctx.fillStyle = "purple";
+      if (j == 15) {ctx.fillStyle = "yellow"}}};
+    if (i == 5) 
+      {ctx.drawImage(DuckImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
+    if (i == 6) 
+      {ctx.drawImage(PigeonImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
+    if (i == 7) {if (Level == 1) 
+        {ctx.drawImage(DrainImage, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
+        if (Level == 2) {
+        {ctx.drawImage(DrainImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}}};
+    if (i == 8) 
+      {ctx.drawImage(Farmer, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
+     
+    if (Level != 3 && i != 5 && i != 6 && i != 7 && i != 8) {
+      {ctx.fillRect(Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};
+    if (Level == 3 && i != 2) {
+      {ctx.fillRect(Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};                                   
+                                           }                }
+                       };                             
+
+  // This function will be called when a key on the keyboard is pressed
+  function keydown(e) {
+  // 37 is the code for the left arrow key
+  if(e.keyCode == 37) {keys.left = true};
+  // 32 is the code for the spacebar
+  if(e.keyCode == 32) {if (Player.jump == false) {Player.y_v = -15}};
+  // 38 is the code for the up arrow key
+  if(e.keyCode == 38) {keys.up = true};
+
+  document.body.onkeyup = function(e) {if(e.keyCode == 38 && Player.jump) {
+    // Flapping physics; each flap costs a stamina point (see chicken wing icon)
+    if (Player.Stamina > 0) {Player.y_v = -10; Player.Stamina--}          }
+                                      };
+
+  // 39 is the code for the right arrow key
+  if(e.keyCode == 39) {keys.right = true};
+  // 40 is the code for the down arrow key
+  if(e.keyCode == 40) {keys.down = true}
+                      };
+
+  // Gotta replenish that stamina somehow, one point per five seconds seems fair
+  setInterval(function () {if (Player.Stamina < 5) {Player.Stamina++}}, 5000);                                   
+
+  // This function is called when the pressed key is released
+  function keyup(e) {
+  if (e.keyCode == 37) {keys.left = false};
+  if (e.keyCode == 32) {if(Player.y_v < -2) {Player.y_v = -3}};
+  if (e.keyCode == 38) {keys.up = false};
+  if (e.keyCode == 39) {keys.right = false};
+  if (e.keyCode == 40) {keys.down = false};
+                    }; 
+
+  var Scroll = [false, false]; // Level's too big to fit on-stage, therefore the map is scrolled
+  
+  function ScrollConditions() {// To scroll or not to scroll, that is the question...
+    if (Level != 3) {if (Player.x - Map[2][0].x >= 512 &&
+        Map[2][Map[2].length-1].x + Map[2][Map[2].length-1].width - Player.x >= 512) 
+    {Scroll[0] = true} else {Scroll[0] = false}};
+    if (Level == 3) {if (Player.x - Map[1][0].x >= 512 &&
+        Map[1][Map[1].length-1].x + Map[1][Map[1].length-1].width - Player.x >= 512) 
+    {Scroll[0] = true} else {Scroll[0] = false}};
+    if (Level == 1) {if (Map[2][0].y - Player.y > 526 && Player.y - Map[4][9].y > 40) 
+      {Scroll[1] = true} else {Scroll[1] = false}};
+    if (Level == 2) {if (Map[2][0].y - Player.y > 526) {Scroll[1] = true} else {Scroll[1] = false}};
+    if (Level == 3) {if (Map[1][0].y - Player.y > 526) {Scroll[1] = true} else {Scroll[1] = false}};
+    if (Scroll[0] == false) {Player.x += Player.x_v};
+    if (Scroll[1] == false) {Player.y += Player.y_v}
+                              };
+
+  // Horizontal collision check
+  var Block = false;  
+  function Collision() {for (let i = 1; i < Map.length; i++) {                        
+    for (let j = 0; j < Map[i].length; j++) {
+      // Player x coordinate lies between those of map element
+      if (Map[i][j].x - Player.width < Player.x && Player.x < Map[i][j].x + Map[i][j].width) {                                               
+      // Player lands on element
+      if (Map[i][j].y - 10 < Player.y + Player.height && 
+          Player.y + Player.height <= Map[i][j].y + 10) {
+        if (Level != 3 && i >= 2 && i <= 4)     {Player.jump = false; Player.y_v = 0; 
+          Player.y = Map[i][j].y - Player.height};
+        if (Level == 3 && i == 1) {Player.jump = false; Player.y_v = 0; 
+          Player.y = Map[i][j].y - Player.height};
+        // 'Player.bounce = true' prevents Player from getting frozen by same enemy it bounces off
+        if (i == 5 || i == 6)                {Player.bounce = true;
+        if (Level == 2 && i == 5 && j == 1) {Player.bounce = false}; 
+        if (Player.bounce){Player.y_v = -15} }          }
+      // Player hits element from underneath
+      if (i == 4 && Level != 3 && Map[i][j].y + Map[i][j].height - 10 < Player.y && 
+        Player.y < Map[i][j].y + Map[i][j].height - Player.y_v) {Player.y_v = 0};
+      // Player y coordinate lies between those of map element  
+      if (Map[i][j].y < Player.y + Player.height && Player.y < Map[i][j].y + Map[i][j].height) {
+        if (i == 4 && Level != 3) {Player.x_v = 0; 
+          if (Player.x < Map[i][j].x - Player.width + 5) {Player.x = Map[i][j].x - Player.width;
+            if (Scroll[0] == true && Player.x < 507) {Block = "right"}}; 
+          if (Player.x > Map[i][j].x+Map[i][j].width - 5) {Player.x = Map[i][j].x+Map[i][j].width;
+            if (Scroll[0] == true && Player.x > 517) {Block = "left"}}};
+        if ((i == 5 || i == 6) && Player.bounce == false) {Player.x_v = 0; Block = "hit"};
+        if (i == 1 && keys.up) {Player.y_v = -10};                                      
+        if (Level == 1) {if (i == 7 && keys.down || Player.y <= Map[4][9].y)  
+          { Level++; Map = []; LevelLoad(); // Level 1 --> 2 transition
+            Map = JSON.parse(JSON.stringify(MapSpec));
+            x_b = JSON.parse(JSON.stringify(X_b[1])); y_b = JSON.parse(JSON.stringify(Y_b[1])); 
+            Player.x = Map[0].x; Player.y = Map[0].y; Player.Stamina = -2;
+            clearInterval(Reverse); Reverse = setInterval(function () {if (Level == 1 || Level == 2) 
+            {for (let p = 0; p < Map[6].length; p++) {Map[6][p].y_v *= -1}}}, 5000)
+          }             };
+        if (Level == 2 && i == 7 && j == 1 && keys.up) {Obstacle = []; Water = []; Drain = [];
+          Ground = []; Level++; Map = []; LevelLoad(); // Level 2 --> 3 transition
+          x_b = JSON.parse(JSON.stringify(X_b[2])); y_b = JSON.parse(JSON.stringify(Y_b[2]));
+          Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
+          Player.width = 100; Player.height = 100;
+          clearInterval(Reverse); Player.Stamina = 5   }                                     }                                                   
+                                                                                             }                
+                                            }                }
+                       };
+
+  var Reverse =                      
+    setInterval(function () {if (Level == 1 || Level == 2) {for (let p = 0; p < Map[6].length; p++) 
+      {Map[6][p].y_v *= -1}}}, 5000); // Flying mobs switch direction every five seconds                     
+
+  function ScrollFunction() {
+    if (Scroll[0] == true) {
+      // The below two lines disable Block when Player y coordinates exceed those of obstacle
+      if (Player.x < 512) {Player.x++}; if (Player.x > 512) {Player.x--};
+      if (Block == "right" && Player.x > 510 || Block == "left" && Player.x < 514) {Block = false};
+      // Disable Player.bounce, cannot leave Player invincible after all...
+      if (Player.bounce == true) {setTimeout(function() {Player.bounce = false}, 50)};
+      // Disable Block two seconds after frozen by enemy
+      if (Block == "hit") {
+        if (Level == 2) {
+          x_b = JSON.parse(JSON.stringify(X_b[1])); y_b = JSON.parse(JSON.stringify(Y_b[1]));
+          Map = JSON.parse(JSON.stringify(MapSpec));
+          clearInterval(Reverse); Reverse = // Maintain consistency in mob flight range                      
+      setInterval(function () {for (let p = 0; p < Map[6].length; p++) {Map[6][p].y_v *= -1}}, 5000);
+          Player.x = Map[0].x; Player.y = Map[0].y; Player.Stamina = -2; // Back to spawn you go
+                        } 
+        setTimeout(function() {Block = false}, 10);              
+                          };
+      // Stage horizontally scrolls with player, by moving map opposite to player's velocity  
+      for (let i = 0; i < Map.length; i++) 
+        {for (let j = 0; j < Map[i].length; j++) {if (Block == false || 
+          Block == "right" && Player.x_v < 0 || Block == "left" && Player.x_v > 0) 
+          {Map[i][j].x -= Player.x_v; Block = false}}};
+      if (Block == false) {if (Level == 1) {x_b -= 0.15*Player.x_v}; // Moving the background
+                           if (Level == 2) {x_b -= 0.33*Player.x_v};
+                           if (Level == 3) {x_b -= Player.x_v}}
+                           };                                                   
+    if (Scroll[1] == true) {
+      if (Player.y < 30) {Player.y = 30}; // Don't want the player to disappear off-stage
+      // Stage vertically scrolls with player, by moving map opposite to player's velocity  
+      if (Level == 1) {for (let i = 0; i < 8; i++) 
+        {for (let j = 0; j < Map[i].length; j++) {Map[i][j].y -= Player.y_v}};
+        if (Block == false) {y_b -= 0.25*Player.y_v}}; // Moving the background
+      if (Level == 2) {for (let i = 0; i < Map.length; i++) 
+        {for (let j = 0; j < Map[i].length; j++) {Map[i][j].y -= Player.y_v}};
+        if (Block == false) {y_b -= Player.y_v}};
+      if (Level == 3) {for (let i = 0; i < 2; i++) 
+        {for (let j = 0; j < Map[i].length; j++) {Map[i][j].y -= Player.y_v}};
+        y_b -= Player.y_v};         
+                           }}; 
+
+  function PlayerMotion() {
+    // Map's left boundary for player
+    if (Level != 3) {if (Player.x < Map[2][0].x) {Player.x = Map[2][0].x}}
+    else {if (Player.x < Map[1][0].x) {Player.x = Map[1][0].x}}; // If Level *is* 3 of course
+
+    // Map's right boundary for player
+    if (Level != 3) {
+      if (Player.x > Map[2][Map[2].length-1].x + Map[2][Map[2].length-1].width - Player.width) 
+        {Player.x = Map[2][Map[2].length-1].x + Map[2][Map[2].length-1].width - Player.width}
+                    }
+    else {// If Level *is* 3 of course
+      if (Player.x > Map[1][Map[1].length-1].x + Map[1][Map[1].length-1].width - Player.width) 
+        {Player.x = Map[1][Map[1].length-1].x + Map[1][Map[1].length-1].width - Player.width}
+         };
+    
+    // If the player is not jumping apply the effect of frictiom
+    if (Player.jump == false) {Player.x_v *= friction} else {if (Player.y_v < 10) {
+      // If the player is in the air then apply the effect of gravity
+      Player.y_v += gravity}}; Player.jump = true; 
+
+    // If the left key is pressed initiate/maintain the relevant horizontal velocity
+    if (keys.left) {Player.x_v = -2.5};
+    if (keys.right) {Player.x_v = 2.5}
+                          };                              
+                       
+  function MobMotion() {for (let d = 0; d < Map[5].length; d++) {Map[5][d].x += Map[5][d].x_v;
+    Map[5][d].y++;
+    for (let i = 2; i < 5; i++) {for (let j = 0; j < Map[i].length; j++) {
+      // Duck x coordinate lies between those of solid element
+      if (Map[i][j].x - Map[5][d].width < Map[5][d].x && 
+        Map[5][d].x < Map[i][j].x + Map[i][j].width) 
+        {// Duck y coordinate lies between those of solid element 
+        if (i == 4 && Map[i][j].y + 10 < Map[5][d].y + Map[5][d].height 
+          && Map[5][d].y < Map[i][j].y + Map[i][j].height) {Map[5][d].x_v *= -1};
+        // Duck y coordinate lies directly above those of solid element
+      if (Map[i][j].y < Map[5][d].y + Map[5][d].height && 
+      Map[5][d].y + Map[5][d].height <= Map[i][j].y + 10) {
+        Map[5][d].y = Map[i][j].y - Map[5][d].height
+                                                          }              
+        }                                                                }     
+                                }                               };
+      // Flying physics for flying mobs
+      for (let p = 0; p < Map[6].length; p++) {Map[6][p].y += Map[6][p].y_v};                        
+                       };
+  
+  // "I'm gonna get you!" >:-D                     
+  function Sweep() {
+    if (Level == 1) {Map[8][0].x += Map[8][0].x_v};
+    if (Level == 3) {Map[2][0].x += Map[2][0].x_v}
+                   };
+
+  // Too bad, try again
+  function Death() {
+    if (Level == 1) {
+      if (Player.y > 580 || Player.x < Map[8][0].x + 0.5*Map[8][0].width) {
+        Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
+        Player.x_v = 0; Player.y_v = 0; Player.Lives--; Player.Stamina = 5;
+        x_b = JSON.parse(JSON.stringify(X_b[0])); y_b = JSON.parse(JSON.stringify(Y_b[0]));
+      clearInterval(Reverse); Reverse =                        
+      setInterval(function () {for (let p = 0; p < Map[6].length; p++) {Map[6][p].y_v *= -1}}, 5000)                    
+                                                                          }  
+                    }                         
+                   };
+
+  var Text = "";                 
+  function Message() {// Send different messages to player depending on level and position
+    if (Level == 1) {if (Player.x <= 400) {Text = "--> RUN! -->"};
+      if (400 < Player.x && Player.x < 550) {Text = ""};
+      if (550 < Player.x && Player.x < 700) {Text = "Easy: Press the Down key to enter the drain"};
+      if (Player.x >= 700 && Player.y > 50) {Text="Hard: Press the Up key to climb the water column"};
+      if (Player.x >= 700 && Player.y <= 50) {Text = 
+        "Hope you bought yourself enough time to make the climb"}
+                    };
+    if (Level == 2) {if (Player.x < 100) {Text = 
+      "No one's chasing after you this level, don't worry"};
+                     if (100 <= Player.x && Player.x < 400) {Text = 
+      "But if you get hit, then it's back to the spawn for you!"};
+      if (400 <= Player.x && Player.x < 550) {Text = ""};
+      if (Player.x >= 550) {Text =
+      "This time, press the Up key to enter the drain above"}              
+                    };
+    if (Level == 3) {if (Player.x <= 400) {Text = "--> I'd keep moving if I were you -->"};
+    if (Player.x - Map[1][0].x > 500 && Player.x - Map[1][0].x < 1000) 
+      {Text = 'Reflection: "Was escaping from the farm worthwhile?"'};
+    if (Player.x - Map[1][0].x > 1000 && Player.x - Map[1][0].x < 1500) 
+      {Text = 'Reflection: "Foxes, eagles, everything\'s out to get me!"'};
+    if (Player.x - Map[1][0].x > 1500 && Player.x - Map[1][0].x < 1750) 
+      {Text = 'Reflection: "Escaped one predator, only to have to..."'};
+    if (Player.x - Map[1][0].x > 1750 && Player.x - Map[1][0].x < 2000)  
+      {Text = 'Reflection: "... constantly watch over my shoulder for another"'};
+    if (Player.x - Map[1][0].x > 2000 && Player.x - Map[1][0].x < 2500) 
+      {Text = 'Reflection: "As well as having to fend for myself"'};
+    if (Player.x - Map[1][0].x > 2500 && Player.x - Map[1][0].x < 3000) 
+      {Text = 'Reflection: "How long does a chicken survive in the wild for?"'};
+    if (Player.x - Map[1][0].x > 3000 && Player.x - Map[1][0].x < 3500) 
+      {Text = 'Reflection: "I know that I cannot keep running forever"'};
+    if (Player.x - Map[1][0].x > 3500 && Player.x - Map[1][0].x < 3750) 
+      {Text = 'Reflection: "Even if I could, what\'s the point of..."'};
+    if (Player.x - Map[1][0].x > 3750 && Player.x - Map[1][0].x < 4000)
+      {Text = 'Reflection: "... perpetually living in fear?"'};
+    if (Player.x - Map[1][0].x > 4000 && Player.x - Map[1][0].x < 4500) 
+      {Text = 'Reflection: "Why don\'t I just give up already?"'};
+    if (Player.x - Map[1][0].x > 4500 && Player.x - Map[1][0].x < 5000) 
+      {Text = 'Reflection: "I can feel my bones becoming brittle, my muscles wasting away"'};
+    if (Player.x - Map[1][0].x > 5000 && Player.x - Map[1][0].x < 5500) 
+      {Text = 'Reflection: "I regret not flying away to a tropical paradise"'};
+    if (Player.x - Map[1][0].x > 5500 && Player.x - Map[1][0].x < 6000) 
+      {Text = 'Reflection: "I\'m an old rooster now, I don\'t have much longer"'};
+    if (Player.x - Map[1][0].x > 6000 && Player.x - Map[1][0].x < 6250) 
+      {Text = 'Reflection: "Even the youngest chick I knew on the farm met..."'};
+    if (Player.x - Map[1][0].x > 6250 && Player.x - Map[1][0].x < 6500)
+      {Text = 'Reflection: "... their demise in the abbatoir years ago"'};
+    if (Player.x - Map[1][0].x > 6500 && Player.x - Map[1][0].x < 7000) 
+      {Text = 'Reflection: "At least I have the privilege of not dying young on the farm"'};
+    if (Player.x - Map[1][0].x > 7000) 
+      {Text = 'Reflection: "I accept my fate now, Grim Reaper, take me away!"'}
+                    };                
+                     }; 
+                     
+  function ImageFlip() {// When the character direction changes, so does the image used for it
+    if (keys.right) {Chicken.src = "ChickenR.gif"}; if (keys.left) {Chicken.src = "ChickenL.gif"};
+    if (Level == 1) {for (let d = 0; d < Map[5].length; d++) {
+      if (Map[5][d].x_v > 0) {DuckImage[d].src = "DuckR.gif"};
+      if (Map[5][d].x_v < 0) {DuckImage[d].src = "DuckL.gif"};
+                                                             }
+                    };
+    if (Level == 2) {for (let d = 0; d < Map[5].length; d++) {
+      if (Map[5][d].width < 30 && Map[5][d].x_v > 0) {DuckImage[d].src = "RatR.gif"};
+      if (Map[5][d].width < 30 && Map[5][d].x_v < 0) {DuckImage[d].src = "RatL.gif"};
+      if (Map[5][d].width > 30 && Map[5][d].x_v > 0) {DuckImage[d].src = "FishR.gif"};
+      if (Map[5][d].width > 30 && Map[5][d].x_v < 0) {DuckImage[d].src = "FishL.gif"};
+                                                             }
+                    };
+    if (Level == 1) {Farmer.src = "Farmer.gif"};
+    if (Level == 3) {Farmer.src = "Reaper.gif"};                                   
+                       };
+  
+  var Screen = new Image(); var Game = "Off"; 
+
+  function Scene() {// Cover pages are displayed
+    if (Game == "Off") {Screen.src = "Menu.jpg"; 
+      ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
+      setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "green";
+        ctx.fillText("Click here to play", 380, 300);
+        canvas.onclick = function() {Level = 1; LevelLoad(); 
+          Map = JSON.parse(JSON.stringify(MapSpec));
+          x_b = JSON.parse(JSON.stringify(X_b[Level-1])); 
+          y_b = JSON.parse(JSON.stringify(Y_b[Level-1])); 
+          Player.x = Map[0].x; Player.y = Map[0].y; Player.Lives = 5; Player.Stamina = 5;
+          Player.width = 20; Player.height = 20;
+          clearInterval(Reverse); 
+          Reverse = setInterval(function () {if (Level == 1 || Level == 2) 
+            {for (let p = 0; p < Map[6].length; p++) {Map[6][p].y_v *= -1}}}, 5000);
+          Game = "On"               }
+                            }, 3000)};
+
+    if (Level == 1 && Player.Lives < 0) {Game = "Over"; // Oh no! <;-(
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      Screen.src = "GameOver1.jpg";
+      ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
+      setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "white";
+        ctx.fillText("Click to return to menu", 360, 300);
+        canvas.onclick = function() {Level = 0; Game = "Off"}
+                            }, 3000)}
+                          
+    if (Level == 3) {
+      if (Player.x < Map[2][0].x + 0.5*Map[2][0].width) {Game = "Over"; // Thanks for playing
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      Screen.src = "Ending1.jpg";
+      ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
+      setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "white";
+        ctx.fillText("Click to return to menu", 360, 300);
+        canvas.onclick = function() {Level = 0; Game = "Off"}
+                            }, 3000)                    }  
+                    }                      
+                          };  
+  
+  // Icons are more visually appealing than text alone, a picture paints a thousand words                        
+  const Icon = [new Image(), new Image()]; Icon[0].src = "Stamina.gif"; Icon[1].src = "Lives.gif";
+  
+  function Proximity() {// When the player is close to capture
+    if ((Level==1 && Player.x-Map[8][0].x < 500) || (Level==3 && Player.x-Map[2][0].x < 500)) 
+      {Player.Surprised = true} else {Player.Surprised = false}
+                       };
+
+  function loop() {if (Game == "On") {
+    ImageLoad(); ImageFlip();
+    PlayerMotion(); ScrollConditions(); ScrollFunction(); Collision();
+    
+    if (Level == 1 || Level == 2) {MobMotion()}; 
+    if (Level == 1 || Level == 3) {Sweep()};
+
+    // Rendering the canvas, the player, the platforms and the obstacles
+    RenderCanvas(); RenderMap(); RenderPlayer();
+
+    // Gamestate
+    Death();
+
+    // Updating canvas messages
+    Message(); Proximity();
+
+    // Displaying the stamina and lives
+    ctx.drawImage(Icon[0], 10, 10, 100, 60); ctx.drawImage(Icon[1], 550, 10, 60, 60);
+    ctx.font = "30px Arial"; 
+    if (Level == 1) {ctx.fillStyle = "black"}; 
+    if (Level == 2) {ctx.fillStyle = "white"};
+    if (Level == 3) {ctx.fillStyle = "turquoise"};
+    ctx.fillText("X " + Player.Stamina, 100, 50); 
+    ctx.fillText("X " + Player.Lives, 600, 50);
+    ctx.fillText("Level: " + Level, 900, 50);
+    ctx.fillText(Text, 10, 100);
+    // Expressing the player's shock of the prospect of being captured
+    if (Player.Surprised) {
+    ctx.fillText("!", Player.x + 0.5*Player.width, Player.y - 30)}      
+                                     };
+    
+    Scene();
+                  };
+
+  canvas = document.getElementById("canvas");
+  ctx = canvas.getContext("2d"); ctx.canvas.height = 576; ctx.canvas.width = 1024;
+    
+  // Adding the event listeners
+  document.addEventListener("keydown",keydown); document.addEventListener("keyup",keyup);
+  setInterval(loop,22);                            
+
+  // Disabling keyboard scrolling, for obvious reasons
+  window.addEventListener("keydown", function(e) {
+    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+        e.preventDefault();                                                           }
+                                                 }, false);
+
+ </script>
+</html>
