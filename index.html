@@ -33,16 +33,13 @@
   var gravity = 0.6; var friction = 0.7;
 
   // Below, the image files are referenced and uploaded
-  var Background = new Image(); 
+  var Background = new Image(); Background.src = "BackgroundL1.jpg"; 
   const X_b = [-10, -10, -10]; const Y_b = [-1100, -700, -400]; 
   const X_bw = [1500, 1750, 10000]; const Y_bw = [1800, 2000, 1000];
   var x_b = JSON.parse(JSON.stringify(X_b[0])); 
   var y_b = JSON.parse(JSON.stringify(Y_b[0]));
   // Function to render the canvas
-  function RenderCanvas() { 
-    Background.src = "BackgroundL" + Level + ".jpg";
-    ctx.drawImage(Background, x_b, y_b, X_bw[Level-1], Y_bw[Level-1])
-                          };
+  function RenderCanvas() {ctx.drawImage(Background, x_b, y_b, X_bw[Level-1], Y_bw[Level-1])};
 
   var Chicken = new Image(); Chicken.src = "ChickenR.gif"; // Our beloved protagonist <:-)
   var DuckImage = []; var PigeonImage = []; var DrainImage = [];
@@ -305,15 +302,16 @@
         if ((i == 5 || i == 6) && Player.bounce == false) {Player.x_v = 0; Block = "hit"};
         if (i == 1 && keys.up) {Player.y_v = -10};                                      
         if (Level == 1) {if (i == 7 && keys.down || Player.y <= Map[4][9].y)  
-          { Level++; Map = []; LevelLoad(); // Level 1 --> 2 transition
-            Map = JSON.parse(JSON.stringify(MapSpec));
+          { Background.src = "BackgroundL2.jpg"; Level++; Map = []; LevelLoad(); 
+            Map = JSON.parse(JSON.stringify(MapSpec)); // Level 1 --> 2 transition
             x_b = JSON.parse(JSON.stringify(X_b[1])); y_b = JSON.parse(JSON.stringify(Y_b[1])); 
             Player.x = Map[0].x; Player.y = Map[0].y; Player.Stamina = -2;
             clearInterval(Reverse); Reverse = setInterval(function () {if (Level == 1 || Level == 2) 
             {for (let p = 0; p < Map[6].length; p++) {Map[6][p].y_v *= -1}}}, 5000)
           }             };
-        if (Level == 2 && i == 7 && j == 1 && keys.up) {Obstacle = []; Water = []; Drain = [];
-          Ground = []; Level++; Map = []; LevelLoad(); // Level 2 --> 3 transition
+        if (Level == 2 && i == 7 && j == 1 && keys.up) {// Level 2 --> 3 transition
+          Background.src = "BackgroundL3.jpg";
+          Obstacle = []; Water = []; Drain = []; Ground = []; Level++; Map = []; LevelLoad(); 
           x_b = JSON.parse(JSON.stringify(X_b[2])); y_b = JSON.parse(JSON.stringify(Y_b[2]));
           Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
           Player.width = 100; Player.height = 100;
@@ -507,7 +505,7 @@
   var Screen = new Image(); var Game = "Off"; 
 
   function Scene() {// Cover pages are displayed
-    if (Game == "Off") {Screen.src = "Menu.jpg"; 
+    if (Game == "Off") {Screen.src = "Menu.jpg"; Background.src = "BackgroundL1.jpg";
       ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
       setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "green";
         ctx.fillText("Click here to play", 380, 300);
