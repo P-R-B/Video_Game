@@ -1,6 +1,8 @@
 # Video_Game
 Chicken Crossing - Don't worry about the why, just get to the other side
 
+Available at: https://p-r-b.github.io/Video_Game/
+
 For my video game, I opted for a 2-D platform genre. As a fan of the Super Mario franchise myself, I drew inspiration from it for the gameplay physics. When I my work on the game began, I was new to Javascript and did not know how to generate images using it. As such, I relied on the tutorial provided below, using it as an initial template. This served as an important foundation to my progress as I had tremendous success with building on top of the initial script and modifying it to make it my own.
 https://www.educative.io/answers/how-to-make-a-simple-platformer-using-javascript
 
