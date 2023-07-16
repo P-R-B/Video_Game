@@ -11,5 +11,8 @@ As a platform game, there were multiple variables that needed to be accounted fo
 The level-building itself was relatively straightforward, the complexity lay with having to use multiple conditions so that the functions used would work on all the levels where they are required (the map sizes and array lengths varied).
 
 Towards the end of the development came the introduction of images and scenery to enhance the immersive experience of the game. You won't find any of those images on any search engine, as they were all custom-drawn by yours truly on Paint.NET. It was at this stage where I added an opening screen, as I found it unprofessional to the game to spit the player right into the level as soon as the page loads.
+Some of the existing images were later upscaled and/or tweaked to improve their appearances and patch poor quality paints.
 
 The game script may be long and complex, may not make the most efficient utilisation of JavaScript's features, however I used whatever was available to me to complete the job. In hindsight, I am pleased with the finished product, and take great pride in my accomplishment, considering that this is my first Javascript game.
+
+The game itself is adventure-based with three different "happy" endings. The gameplay mechanics slightly vary per level to keep the challenges fresh and original.
