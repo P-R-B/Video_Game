@@ -11,7 +11,14 @@
    <h1>Video Game</h1>                                     <!--Page title, visible on browser page-->
   </header>
 
-  <h2>Chicken Crossing</h2>
+  <h2>Chicken Crossing
+    <img src = "Banner.gif" title = "Chicken Crossing logo banner">
+  </h2>
+
+  <p>This game's resolution is 1024 x 576, with the 16:9 aspect ratio typically used for
+     Youtube videos. Handy if you wish to record the gameplay.<br>
+     Keyboard scrolling is disabled on this page, for obvious reasons.
+  </p>
 
   <div class = "Stage">
    <canvas id = "canvas"></canvas>
@@ -840,7 +847,16 @@
                      }; 
                      
   function ImageFlip() {// When the character direction changes, so does the image used for it
-    if (keys.right) {Chicken.src = "ChickenR.gif"}; if (keys.left) {Chicken.src = "ChickenL.gif"};
+    if (Player.jump == false) 
+      {if (keys.right) {Chicken.src = "ChickenR.gif"}; if (keys.left) {Chicken.src = "ChickenL.gif"}}
+    else {// Default image based on existing image
+      if (Chicken.src == "ChickenR.gif") {Chicken.src = "ChickenJR.gif"};
+      if (Chicken.src == "ChickenL.gif") {Chicken.src = "ChickenJL.gif"};
+      // Key press overrides default image selection, so it appears later in function
+      if (keys.right) {Chicken.src = "ChickenJR.gif"};
+      if (keys.left) {Chicken.src = "ChickenJL.gif"}
+         };
+    
     if (Level == 1 || Level == 4) {for (let d = 0; d < Map[5].length; d++) {
       if (Map[5][d].x_v > 0) {DuckImage[d].src = "DuckR.gif"};
       if (Map[5][d].x_v < 0) {DuckImage[d].src = "DuckL.gif"}
@@ -930,7 +946,7 @@
                             }, 3000)     }  
                     };
                     
-    if (Level == 6) {
+    if (Level == 6) { // Tron style!
       if (Map[7][0].x < Player.x && Player.x < Map[7][0].x + Map[7][0].width &&
           Map[7][0].y < Player.y && Player.y < Map[7][0].y + Map[7][0].height && keys.up) 
       { Game = "Over"; // Thanks for playing
