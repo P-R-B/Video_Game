@@ -515,7 +515,10 @@
             x_b = JSON.parse(JSON.stringify(X_b[4])); y_b = JSON.parse(JSON.stringify(Y_b[4])); 
             Player.x = Map[0].x; Player.y = Map[0].y; Player.Stamina = 5;
             clearInterval(Reverse); Player.Surprised = false
-          };           
+          };
+        if (Level == 6 && Map[7][0].x < Player.x && Player.x < Map[7][0].x + Map[7][0].width &&
+          Map[7][0].y < Player.y && Player.y < Map[7][0].y + Map[7][0].height && keys.up)
+          { Game = "Over"}           
                                                                                              }                                                   
                                                                                              }                
                                             }                }
@@ -946,18 +949,14 @@
                             }, 3000)     }  
                     };
                     
-    if (Level == 6) { // Tron style!
-      if (Map[7][0].x < Player.x && Player.x < Map[7][0].x + Map[7][0].width &&
-          Map[7][0].y < Player.y && Player.y < Map[7][0].y + Map[7][0].height && keys.up) 
-      { Game = "Over"; // Thanks for playing
-        ctx.clearRect(0, 0, canvas.width, canvas.height); canvas.onclick = [];
-        Screen.src = "Ending3.jpg";
-        ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
-        setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "pink";
-        ctx.fillText("Click to return to menu", 360, 300);
-        canvas.onclick = function() {Level = 0; Game = "Off"}
-                              }, 3000)                      
-      }             }                                
+    if (Level == 6 && Game == "Over" && Player.Lives > 0) { // Tron style!
+      ctx.clearRect(0, 0, canvas.width, canvas.height); canvas.onclick = [];
+      Screen.src = "Ending3.jpg";
+      ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
+      setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "pink";
+      ctx.fillText("Click to return to menu", 360, 300);
+      canvas.onclick = function() {Level = 0; Game = "Off"}
+                              }, 3000)                    }                                                                                 
                           };  
   
   // A picture paints a thousand words                        
