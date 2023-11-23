@@ -21,13 +21,6 @@
      Keyboard scrolling is disabled on this page, for obvious reasons.
   </p>
 
-  <p><strong><u>Name Your Avatar!</u></strong> (won't update name when game is running)</p>
-
-  <input type = "text" id = "Username" value = "Type your username here">
-  <button onclick = "Baptism()">Enter</button>
-  
-  <p id = "NameVerdict">Does the game accept that name?</p>
-
   <div class = "Stage">
    <canvas id = "canvas"></canvas>
   </div>
@@ -881,15 +874,7 @@
                     }                                         
                    };
 
-  var UserName = "Player";
-  function Baptism() {if (Game == "Off") 
-    {UserName = document.getElementById("Username").value;
-     document.getElementById("NameVerdict").innerHTML = "Good, will do!";
-     if (UserName.length == 0) {document.getElementById("NameVerdict").innerHTML = "No name?";       
-                                UserName = "Player"};
-     if (UserName.length > 20) {document.getElementById("NameVerdict").innerHTML = "Too long!";       
-                                UserName = "Player"}
-    }                };
+  var UserName = prompt("Name your avatar");          
 
   const SpeechBox = [new Image(), new Image()];
   SpeechBox[0].src = "SpeechBox.gif";
@@ -1567,7 +1552,7 @@
         {ctx.globalAlpha = (Number(Minute[Minute.length-1]) / 10) + (DATE.getMilliseconds() / 10000)}
       else {ctx.globalAlpha = (10-Number(Minute[Minute.length-1])-(DATE.getMilliseconds()/1000))/10};
       ctx.font = "30px Arial"; ctx.fillStyle = "aqua";
-      ctx.fillText("Version Date: 11 Nov 2023", 310, 550); ctx.globalAlpha = 1;
+      ctx.fillText("Version Date: 23 Nov 2023", 310, 550); ctx.globalAlpha = 1;
 
       ctx.drawImage(Logo, 100, 10, 800, 70);
       ctx.drawImage(Label, 275, 75, 483, 62);
@@ -1598,8 +1583,8 @@
       ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
       setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "white";
         ctx.fillText("Click to return to menu", 360, 300);
-        canvas.onclick = function() {Level = 0; Game = "Off"}
-                            }, 3000)};
+        canvas.onclick = function() {Level = 0; Game = "Off"; UserName = prompt("Name your avatar")}
+                            }, 3000)    };
 
     if (Level == 3 && Player.Lives < 0) {Game = "Over"; // Goodness gracious! <;-(
       ctx.clearRect(0, 0, canvas.width, canvas.height); canvas.onclick = [];
@@ -1607,7 +1592,7 @@
       ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
       setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "white";
         ctx.fillText("Click to return to menu", 360, 300);
-        canvas.onclick = function() {Level = 0; Game = "Off"}
+        canvas.onclick = function() {Level = 0; Game = "Off"; UserName = prompt("Name your avatar")}
                             }, 3000)};                    
 
     if (Level == 4 && Player.Lives < 0) {Game = "Over"; // Oh no! <;-(
@@ -1617,7 +1602,7 @@
       ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
       setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "turquoise";
         ctx.fillText("Click to return to menu", 360, 300);
-        canvas.onclick = function() {Level = 0; Game = "Off"}
+        canvas.onclick = function() {Level = 0; Game = "Off"; UserName = prompt("Name your avatar")}
                             }, 3000)};                                              
                             
     if (Level == 6 && Player.Lives < 0) {Game = "Over"; // Oh yes, the farm's where you belong >:-D
@@ -1626,7 +1611,7 @@
       ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
       setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "pink";
         ctx.fillText("Click to return to menu", 360, 300);
-        canvas.onclick = function() {Level = 0; Game = "Off"}
+        canvas.onclick = function() {Level = 0; Game = "Off"; UserName = prompt("Name your avatar")}
                             }, 3000)};                        
                     
     if (Level == 5) {
@@ -1636,7 +1621,7 @@
       ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
       setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "lime";
         ctx.fillText("Click to return to menu", 360, 300);
-        canvas.onclick = function() {Level = 0; Game = "Off"}
+        canvas.onclick = function() {Level = 0; Game = "Off"; UserName = prompt("Name your avatar")}
                             }, 3000)     }  
                     };
                     
@@ -1646,7 +1631,7 @@
       ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
       setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "pink";
         ctx.fillText("Click to return to menu", 360, 300);
-        canvas.onclick = function() {Level = 0; Game = "Off"}
+        canvas.onclick = function() {Level = 0; Game = "Off"; UserName = prompt("Name your avatar")}
                               }, 3000)                    };
                               
     if (Level == 7 && Ghost.y <= -100) {Game = "Over"; // Thanks for playing
@@ -1655,7 +1640,7 @@
       ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
       setTimeout(() => {ctx.font = "30px Arial"; ctx.fillStyle = "white";
         ctx.fillText("Click to return to menu", 360, 300); Ghost.y = 456;
-        canvas.onclick = function() {Level = 0; Game = "Off"}
+        canvas.onclick = function() {Level = 0; Game = "Off"; UserName = prompt("Name your avatar")}
                        }, 3000)};                               
                           };  
   
@@ -1688,6 +1673,10 @@
 
   function loop() {DATE = new Date(); // Required for animation frame switching
     Minute = DATE.getSeconds().toString();
+    if (UserName == null) {UserName = prompt("I'm not going away until you name me!")};
+    if (UserName.length == 0) {UserName = prompt("No name? Enter a name damnit!")};
+    if (UserName.length > 20) {UserName = prompt("Too long, enter a shorter name!")};
+    
 
     if (Game == "On") {
       if (keys.pause == false) {
@@ -1753,7 +1742,7 @@
         else {ctx.fillText(T[0] + ":0" + T[1], 270, 67)}};
                                      };
     
-    if (keys.pause) {RenderPause()}; Scene();
+    if (keys.pause) {RenderPause()}; Scene()
                   };
 
   canvas = document.getElementById("canvas");
