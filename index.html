@@ -78,6 +78,11 @@
       {Background = [new Image(), new Image(), new Image(), new Image()];
        Background[0].src = "BackgroundL3-0.jpg"; Background[1].src = "BackgroundL3-1.gif";
        Background[2].src = "BackgroundL3-2.gif"                                           }
+    if (Level == 4)
+      {Background = [new Image(), new Image(), new Image(), new Image(), new Image()];
+       Background[0].src = "BackgroundL4-0.jpg"; Background[1].src = "BackgroundSun.gif";
+       Background[2].src = "BackgroundL4-1.jpg"; Background[3].src = "BackgroundL4-2.jpg";
+       Background[4].src = "BackgroundL4-3.gif"                                           }
     if (Level == 7)
       {Background = [new Image(), new Image(), new Image()]; 
        Background[0].src = "BackgroundL7-0.jpg"; Background[1].src = "BackgroundL7-1.gif";
@@ -93,19 +98,60 @@
   const X_b3 = [-38, -10, -10]; const Y_b3 = [-1420, -50, 20];
   const X_bw3 = [1100, 2100, 3200]; const Y_bw3 = [2000, 576, 576];
 
+  const X_b4 = [0, 800, -10, -10, -10]; const Y_b4 = [-4424, 50, -124, 360, -120];
+  const X_bw4 = [1024, 125, 5000, 5000, 3000]; const Y_bw4 = [5000, 125, 700, 219, 700];
+
   const X_b7 = [0, -10, -10]; const Y_b7 = [0, 0, 0];
   const X_bw7 = [1024, 2000, 4000]; const Y_bw7 = [576, 576, 576];
 
-  var x_b = JSON.parse(JSON.stringify(X_b1)); var y_b = JSON.parse(JSON.stringify(Y_b1));
+  var x_b = JSON.parse(JSON.stringify(X_b4)); var y_b = JSON.parse(JSON.stringify(Y_b4));
+
+  var Foreground; 
+  function ForegroundLoad() {
+    if (Level == 4) 
+      {Foreground = [new Image(), new Image(), new Image(), new Image()]; 
+       Foreground[0].src = "ForegroundL4.gif"; Foreground[1].src = "BackgroundL2-0.gif";
+       if (SceneL4 == 23 || SceneL4 == 24) {Foreground[2].src = "HQ_Ext1.jpg";
+         if (Number(String(Temp)[0]) % 2 != 0) 
+         {Foreground[3].src = "HQ_Ext1.jpg"} else {Foreground[3].src = "HQ_Ext2.jpg"}
+                                           }  
+       if (SceneL4 >= 25) {Foreground[2].src = "HQ_Tent1.jpg";
+         if (Number(String(Temp)[0]) % 2 != 0) 
+         {Foreground[3].src = "HQ_Tent1.jpg"} else {Foreground[3].src = "HQ_Tent2.jpg"}
+                          }                                                      
+      }
+                            };
+
+  const X_f4 = [0, -1976, 0, 0]; const Y_f4 = [-174, -1000, 0, 0];
+  const X_fw4 = [1024, 6000, 1024, 1024]; const Y_fw4 = [100, 576, 576, 576];  
+  
+  var x_f = JSON.parse(JSON.stringify(X_f4)); var y_f = JSON.parse(JSON.stringify(Y_f4));
 
   // Function to render the canvas
-  function RenderCanvas() {for (let b = 0; b < Background.length; b++) {
-    if (Level == 1) {ctx.drawImage(Background[b], x_b[b], y_b[b], X_bw1[b], Y_bw1[b])}
-    if (Level == 2) {ctx.drawImage(Background[b], x_b[b], y_b[b], X_bw2[b], Y_bw2[b])}
-    if (Level == 3) {ctx.drawImage(Background[b], x_b[b], y_b[b], X_bw3[b], Y_bw3[b])}
-    if (Level == 7) {ctx.drawImage(Background[b], x_b[b], y_b[b], X_bw7[b], Y_bw7[b])}                
-                                                                       }                                          
+  function RenderCanvas() {let B = Background.length;
+    for (let b = 0; b < B; b++) {
+      if (Level == 1) {ctx.drawImage(Background[b], x_b[b], y_b[b], X_bw1[b], Y_bw1[b])}
+      if (Level == 2) {ctx.drawImage(Background[b], x_b[b], y_b[b], X_bw2[b], Y_bw2[b])}
+      if (Level == 3) {ctx.drawImage(Background[b], x_b[b], y_b[b], X_bw3[b], Y_bw3[b])}
+      if (Level == 4) {
+        if (b != 2) {ctx.drawImage(Background[b], x_b[b], y_b[b], X_bw4[b], Y_bw4[b])}
+        else {
+          if (Player.x < Map[2][1].x) {ctx.drawImage(Background[b], x_b[b], y_b[b], X_bw4[b], Y_bw4[b])}
+          else {ctx.globalAlpha = (1 - ((Player.x - Map[2][1].x) / 50000));
+                ctx.drawImage(Background[b], x_b[b], y_b[b], X_bw4[b], Y_bw4[b]); 
+                ctx.globalAlpha = 1                                              }
+             }        }
+      if (Level == 7) {ctx.drawImage(Background[b], x_b[b], y_b[b], X_bw7[b], Y_bw7[b])}                
+                                }                                          
                           };
+
+  // Function to render the foreground
+  function RenderFore() {let F = Foreground.length;
+    for (let f = 0; f < F; f++) {
+      if (Level == 4) {ctx.drawImage(Foreground[f], x_f[f], y_f[f], X_fw4[f], Y_fw4[f])
+        if (SceneL4 >= 8) {ctx.drawImage(Glider, Gx, Player.y, 162, 104)}}
+                                }
+                        };                        
 
   var Chicken = new Image(); Chicken.src = "ChickenR1.gif"; // Our beloved protagonist <:-)
   var DuckImage = []; var PigeonImage = []; var AppImage = [];
@@ -114,68 +160,75 @@
 
   // A separate render is made for each instance of the map characters
   function ImageLoad() {
-  if (Level == 1) {DuckImage = [new Image(), new Image(), new Image()]; 
-    PigeonImage = [new Image(), new Image(), new Image()]; 
-    AppImage = [new Image(), new Image(), new Image(), new Image(), new Image(), 
-                new Image(), new Image()                                        ]; 
-    AppImage[0].src = "DrainL1.gif"; AppImage[1].src = "AppRight.gif"; 
-    AppImage[2].src = "AppRight.gif"; AppImage[3].src = "AppUpRight.gif";
-    AppImage[4].src = "AppDown.gif"; AppImage[5].src = "AppUp.gif";
-    AppImage[6].src = "HTP.gif"
-                  };
-  if (Level == 2) {DuckImage = [new Image(), new Image()]; 
-    DuckImage[0].src = "RatR.gif"; DuckImage[1].src = "FishR.gif";
-    PigeonImage = [new Image(), new Image()]; 
-    PigeonImage[0].src = "Bat1.gif"; PigeonImage[1].src = "Bat1.gif";
-    AppImage = [new Image(), new Image(), new Image(), new Image(), new Image(), new Image(),
-                new Image(), new Image(), new Image(), new Image()                           ]; 
-    AppImage[0].src = "Drain.gif"; AppImage[1].src = "Drain.gif"; AppImage[2].src = "Portal.jpg";
-    AppImage[3].src = "AppRight.gif"; AppImage[4].src = "AppRight.gif"; 
-    AppImage[5].src = "AppUp.gif"; AppImage[6].src = "AppUpGlitch.gif"; 
-    AppImage[7].src = "AppUpRight.gif"; AppImage[8].src = "Stamina.gif"; 
-    AppImage[9].src = "AppUpRight.gif"
-                  };
-  if (Level == 3) {DuckImage = []; PigeonImage = []; AppImage = [];
-    PlatformImage = [new Image(), new Image()]; 
-    PlatformImage[0].src = "Lift-Off.gif"; PlatformImage[1].src = "Lift-Off.gif";
-    BlockImage = new Image; BlockImage.src = "ObstacleL3.gif";
-                  };
-  if (Level == 4) {DuckImage = [new Image(), new Image()]; 
-    DuckImage[0].src = "DuckR.gif"; DuckImage[1].src = "DuckR.gif";
-    PigeonImage = [new Image(), new Image(), new Image(), new Image()]; 
-    PigeonImage[0].src = "Pigeon.gif"; PigeonImage[1].src = "Pigeon.gif"; 
-    PigeonImage[2].src = "Pigeon.gif"; PigeonImage[3].src = "Pigeon.gif";
-    AppImage = [new Image()]; AppImage[0].src = "Shark.gif"
-                  };
-  if (Level == 5) {
-    for (let c = 0; c < 9; c++) {DuckImage[c] = new Image(); DuckImage[c].src = "ChickenNPC.gif"};
-    PigeonImage = []; AppImage = []
-                  };
-  if (Level == 6) {DuckImage = [new Image(), new Image()]; 
-    DuckImage[0].src = "Boost.gif"; DuckImage[1].src = "Boost.gif";
-    PigeonImage = [new Image(), new Image(), new Image()]; 
-    PigeonImage[0].src = "Boost.gif"; PigeonImage[1].src = "Boost.gif"; 
-    PigeonImage[2].src = "Boost.gif";
-    AppImage = new Image(); AppImage.src = "Bike.gif";
-    Hills = new Image(); Hills.src = "HillsL6.gif";
-    PlatformImage = new Image(); PlatformImage.src = "Platform.gif";
-    BlockImage = new Image; BlockImage.src = "Block.gif";
-                  };
-  if (Level == 7) {AppImage = [new Image(), new Image(), new Image(), new Image(),
-    new Image(), new Image(), new Image(), new Image(), new Image(), new Image(),
-    new Image(), new Image()]; 
-    AppImage[0].src = "AppRight.gif"; AppImage[1].src = "7years.gif";
-    AppImage[2].src = "Lamppost1.gif"; AppImage[3].src = "Bar1.jpg";
-    AppImage[4].src = "Lamppost1.gif"; AppImage[5].src = "Lamppost1.gif";
-    AppImage[6].src = "24hours.gif"; AppImage[7].src = "Superstore.jpg";
-    AppImage[8].src = "Lamppost1.gif"; AppImage[9].src = "Lamppost1.gif";
-    AppImage[10].src = "Lamppost1.gif"; AppImage[11].src = "Salon1.jpg";
-                  }              
+    if (Level == 1) {DuckImage = [new Image(), new Image(), new Image()]; 
+      PigeonImage = [new Image(), new Image(), new Image()]; 
+      AppImage = [new Image(), new Image(), new Image(), new Image(), new Image(), 
+                  new Image(), new Image()                                        ]; 
+      AppImage[0].src = "DrainL1.gif"; AppImage[1].src = "AppRight.gif"; 
+      AppImage[2].src = "AppRight.gif"; AppImage[3].src = "AppUpRight.gif";
+      AppImage[4].src = "AppDown.gif"; AppImage[5].src = "AppUp.gif";
+      AppImage[6].src = "HTP.gif"
+                    };
+    if (Level == 2) {DuckImage = [new Image(), new Image()]; 
+      DuckImage[0].src = "RatR.gif"; DuckImage[1].src = "FishR.gif";
+      PigeonImage = [new Image(), new Image()]; 
+      PigeonImage[0].src = "Bat1.gif"; PigeonImage[1].src = "Bat1.gif";
+      AppImage = [new Image(), new Image(), new Image(), new Image(), new Image(), new Image(),
+                  new Image(), new Image(), new Image(), new Image()                           ]; 
+      AppImage[0].src = "Drain.gif"; AppImage[1].src = "Drain.gif"; AppImage[2].src = "Portal.jpg";
+      AppImage[3].src = "AppRight.gif"; AppImage[4].src = "AppRight.gif"; 
+      AppImage[5].src = "AppUp.gif"; AppImage[6].src = "AppUpGlitch.gif"; 
+      AppImage[7].src = "AppUpRight.gif"; AppImage[8].src = "Stamina.gif"; 
+      AppImage[9].src = "AppUpRight.gif"
+                    };
+    if (Level == 3) {DuckImage = []; PigeonImage = []; AppImage = [];
+      PlatformImage = [new Image(), new Image()]; 
+      PlatformImage[0].src = "Lift-Off.gif"; PlatformImage[1].src = "Lift-Off.gif";
+      BlockImage = new Image; BlockImage.src = "ObstacleL3.gif";
+                    };
+    if (Level == 4) {DuckImage = [new Image(), new Image(), new Image(), new Image(), new Image(), 
+                                  new Image(), new Image(), new Image(), new Image(), new Image(),
+                                  new Image()                                                     ]; 
+      for (let d = 0; d < 11; d++) {DuckImage[d].src = "Boost.gif"}; 
+      PigeonImage = [new Image(), new Image()]; 
+      for (let a = 0; a < 128; a++) {AppImage[a] = new Image(); AppImage[a].src = "PalmTree.gif"}; 
+      AppImage[1].src = "HTP4.gif"; AppImage[127].src = "TruckFLA2.gif"
+                    };
+    if (Level == 5) {
+      for (let c = 0; c < 9; c++) {DuckImage[c] = new Image(); DuckImage[c].src = "ChickenNPC.gif"};
+      PigeonImage = []; AppImage = []
+                    };
+    if (Level == 6) {DuckImage = [new Image(), new Image()]; 
+      DuckImage[0].src = "Boost.gif"; DuckImage[1].src = "Boost.gif";
+      PigeonImage = [new Image(), new Image(), new Image()]; 
+      PigeonImage[0].src = "Boost.gif"; PigeonImage[1].src = "Boost.gif"; 
+      PigeonImage[2].src = "Boost.gif";
+      AppImage = new Image(); AppImage.src = "Bike.gif";
+      Hills = new Image(); Hills.src = "HillsL6.gif";
+      PlatformImage = new Image(); PlatformImage.src = "Platform.gif";
+      BlockImage = new Image; BlockImage.src = "Block.gif";
+                    };
+    if (Level == 7) {AppImage = [new Image(), new Image(), new Image(), new Image(),
+                                 new Image(), new Image(), new Image(), new Image(), 
+                                 new Image(), new Image(), new Image(), new Image() ]; 
+      AppImage[0].src = "AppRight.gif"; AppImage[1].src = "7years.gif";
+      AppImage[2].src = "Lamppost1.gif"; AppImage[3].src = "Bar1.jpg";
+      AppImage[4].src = "Lamppost1.gif"; AppImage[5].src = "Lamppost1.gif";
+      AppImage[6].src = "24hours.gif"; AppImage[7].src = "Superstore.jpg";
+      AppImage[8].src = "Lamppost1.gif"; AppImage[9].src = "Lamppost1.gif";
+      AppImage[10].src = "Lamppost1.gif"; AppImage[11].src = "Salon1.jpg";
+                    }              
                        };
 
   // Function to render the player
-  function RenderPlayer()
-    {ctx.drawImage(Chicken, Player.x, Player.y, Player.width, Player.height)};
+  function RenderPlayer() {
+    if (Level != 4) {ctx.drawImage(Chicken, Player.x, Player.y, Player.width, Player.height)}
+    else {ctx.translate(Player.x+Player.width/2, Player.y+Player.height/2);
+      ctx.rotate(Player.y_v*Math.PI/2/(Player.x_v + Math.abs(Player.y_v)));
+      ctx.drawImage(Chicken, -Player.width/2, -Player.height/2, Player.width, Player.height);
+      ctx.rotate(-Player.y_v*Math.PI/2/(Player.x_v + Math.abs(Player.y_v)));
+      ctx.translate(-Player.x-Player.width/2, -Player.y-Player.height/2)
+         }                };
   // Note: +x is right, +y is down for all coordinates
   
   var Level = 1; // The number specifies the map to be loaded
@@ -185,9 +238,7 @@
   var Water = []; var Apparition = []; var Predator = []; var MapSpec = [];
 
   function LevelLoad() {// Where the fun of level-building happens! >:-D
-    if (Level == 1) {canvas.onclick = [];
-      Spawn = {x: 30, y: 200};
-
+    if (Level == 1) {Spawn = {x: 30, y: 200};
       Water[0] = {x: 3800, y: -4000, width: 100, height: 4556};
 
       Ground[0] = {x: 0, y: 556, width: 2050, height: 40};
@@ -227,13 +278,12 @@
       Apparition[6] = {x: 0, y: 0, width: 1024, height: 576};
 
       Predator[0] = {x: -1000, y: 10, x_v: 2.25, width: 550, height: 550};
+      Predator[1] = {x: -875, y: 20, x_v: 2.25, width: 225, height: 250};
 
       MapSpec = [Spawn, Water, Ground, Platform, Obstacle, Duck, Pigeon, Apparition, Predator]
                     };
 
-    if (Level == 2) {canvas.onclick = [];
-      Spawn = []; Spawn = {x: 35, y: 42};
-
+    if (Level == 2) {Spawn = []; Spawn = {x: 35, y: 42};
       Water = [];
       Water[0] = {x: 1100, y: 750, width: 1500, height: 150};
       Water[1] = {x: 295, y: -100, width: 100, height: 140};
@@ -293,9 +343,7 @@
       MapSpec = [Spawn, Water, Ground, Platform, Obstacle, Duck, Pigeon, Apparition]
                     }; 
                     
-    if (Level == 3) {canvas.onclick = [];
-      Spawn = []; Spawn = {x: 150, y: 400};
-      
+    if (Level == 3) {Spawn = []; Spawn = {x: 150, y: 400};
       Water = []; Water[0] = {x: 500, y: 10, width: 10, height: 10};
       
       Ground = []; Ground[0] = {x: 0, y: 556, width: 3000, height: 40};
@@ -314,50 +362,49 @@
       MapSpec = [Spawn, Water, Ground, Platform, Obstacle, Predator]
                     };
                     
-    if (Level == 4) {canvas.onclick = [];
-      Spawn = []; Spawn = {x: 30, y: 300};
-
+    if (Level == 4) {Spawn = []; Spawn = {x: 30, y: 450};
       Water = [];
-      Water[0] = {x: 0, y: 3400, width: 5000, height: 500};
+      Water[0] = {x: 1000, y: 556, width: 100000, height: 500};
 
       Ground = [];
-      Ground[0] = {x: 0, y: 3730, width: 0, height: 0};
-      Ground[1] = {x: 5000, y: 3400, width: 1000, height: 500};
+      Ground[0] = {x: 0, y: 556, width: 1000, height: 500};
+      Ground[1] = {x: 101000, y: 556, width: 50000, height: 500};
         
       Platform = [];
-      Platform[0] = {x: 4700, y: 3300, width: 400, height: 10};
-      Platform[1] = {x: 5100, y: 3300, width: 30, height: 100};
 
       Obstacle = [];
-      Obstacle[0] = {x: 0, y: 400, width: 100, height: 50};
-      Obstacle[1] = {x: 200, y: 300, width: 500, height: 150};
-      Obstacle[2] = {x: 220, y: 250, width: 50, height: 50};
-      Obstacle[3] = {x: 630, y: 250, width: 50, height: 50};
-      Obstacle[4] = {x: 1700, y: -600, width: 600, height: 100};
-      Obstacle[5] = {x: 2300, y: -520, width: 500, height: 20};
-      Obstacle[6] = {x: 2800, y: -600, width: 500, height: 100};
   
       Duck = [];
-      Duck[0] = {x: 300, y: 190, x_v: 1, width: 100, height: 100};
-      Duck[1] = {x: 2400, y: -650, x_v: 1, width: 100, height: 100};
+      Duck[0] = {x: 200, y: 456, x_v: 1, width: 100, height: 100};
+      Duck[1] = {x: 1500, y: 250, x_v: 1, width: 100, height: 100};
+      Duck[2] = {x: 3000, y: 100, x_v: 1, width: 100, height: 100};
+      Duck[3] = {x: 15000, y: 400, x_v: 1, width: 100, height: 100};
+      Duck[4] = {x: 20000, y: 400, x_v: 1, width: 100, height: 100};
+      Duck[5] = {x: 30000, y: 400, x_v: 1, width: 100, height: 100};
+      Duck[6] = {x: 40000, y: 400, x_v: 1, width: 100, height: 100};
+      Duck[7] = {x: 50000, y: 400, x_v: 1, width: 100, height: 100};
+      Duck[8] = {x: 60000, y: 400, x_v: 1, width: 100, height: 100};
+      Duck[9] = {x: 70000, y: 400, x_v: 1, width: 100, height: 100};
+      Duck[10] = {x: 80000, y: 400, x_v: 1, width: 100, height: 100};
 
       Pigeon = [];
       Pigeon[0] = {x: 850, y: 300, y_v: -1, width: 100, height: 100};
-      Pigeon[1] = {x: 1000, y: -100, y_v: 1, width: 100, height: 100};
-      Pigeon[2] = {x: 1150, y: -300, y_v: -1, width: 100, height: 100};
-      Pigeon[3] = {x: 1300, y: -700, y_v: 1, width: 100, height: 100};
+      Pigeon[1] = {x: 4000, y: -200, y_v: 1, width: 100, height: 100};
 
-      Apparition = []; Apparition[0] = {x: -1000, y: 3300, width: 100, height: 260};
+      Apparition = []; 
+      Apparition[0] = {x: -1000, y: 436, width: 100, height: 260, mode: 0, y_v: 0};
+      Apparition[1] = {x: 200, y: 100, width: 714, height: 422};
+      for (let a = 2; a < 127; a++) {
+        Apparition[a] = {x: 101005 + 400*(a-2), y: 156, width: 390, height: 400}}
+      Apparition[127] = {x: 151000, y: 331, width: 500, height: 225};  
 
-      Predator = []; Predator[0] = {x: -1000, y: 10, x_v: 2, width: 550, height: 550};
+      Predator = []; Predator[0] = {x: -3000, y: 10, x_v: 30, width: 200, height: 180};
 
       MapSpec = [];
       MapSpec = [Spawn, Water, Ground, Platform, Obstacle, Duck, Pigeon, Apparition, Predator]
                     };
                     
-    if (Level == 5) {canvas.onclick = [];
-      Spawn = []; Spawn = {x: 30, y: 200};
-
+    if (Level == 5) {Spawn = []; Spawn = {x: 30, y: 200};
       Ground = []; Ground[0] = {x: 0, y: 556, width: 10000, height: 40};
 
       Duck = []; for (let d = 0; d < 9; d++)
@@ -367,9 +414,7 @@
       MapSpec = [Spawn, Ground, Duck]
                     };
                     
-    if (Level == 6) {canvas.onclick = [];
-      Spawn = {x: 30, y: 200};
-
+    if (Level == 6) {Spawn = {x: 30, y: 200};
       Water[0] = {x: -10, y: 200, width: 5000, height: 400}; // Background hills
 
       Ground[0] = {x: 0, y: 556, width: 3000, height: 40};
@@ -401,9 +446,7 @@
       MapSpec = [Spawn, Water, Ground, Platform, Obstacle, Duck, Pigeon, Apparition, Predator]
                     };
 
-    if (Level == 7) {canvas.onclick = [];
-      Spawn = []; Spawn = {x: 50, y: 400};
-      
+    if (Level == 7) {Spawn = []; Spawn = {x: 50, y: 400};
       Water = []; Water[0] = {x: 500, y: 10, width: 10, height: 10};
       
       Ground = []; Ground[0] = {x: 0, y: 556, width: 8000, height: 40}; 
@@ -439,63 +482,69 @@
                   height: 20, width: 20, Stamina: 5, Lives: 5, Surprised: false, Active: true};  
   
   const keys = {right: false, left: false, up: false, down: false, // Arrow key status
-                pause: false}; 
+                pause: false, jump: false}; 
  
   // Function to render the map
-  function RenderMap() {for (let i = 1; i < Map.length; i++) {
-    for (let j = 0; j < Map[i].length; j++) {
-    if (i == 1) {ctx.fillStyle = "darkcyan"; 
-      if (Level == 2 && j == 0) {ctx.fillStyle = "darkslategrey"};
-      if (Level == 3) {ctx.fillStyle = "orangered"};
-      if (Level == 5) {ctx.fillStyle = "#ffeb99"};
-      if (Level == 6) 
-        {ctx.drawImage(Hills, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}}; 
-    if (i == 2) {if (Level == 1 || Level == 2) {ctx.fillStyle = "green"}
-      if (Level == 4) {ctx.fillStyle = "goldenrod"}
-      if (Level == 5) 
-        {ctx.drawImage(DuckImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}
-      if (Level == 6) {ctx.fillStyle = "deeppink"}
-      if (Level == 7) {ctx.fillStyle = "white"}
-                };
-    if (i == 3) {ctx.fillStyle = "brown";
-      if (Level == 3) 
-        {ctx.drawImage(PlatformImage[j], Map[i][j].x, Map[i][j].y, 
-          Map[i][j].width, Map[i][j].height)}
-      if (Level == 6) 
-        {ctx.drawImage(PlatformImage, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}
-      if (Level == 7) 
-        {ctx.drawImage(AppImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}
-                }
-    if (i == 4) {ctx.fillStyle = "yellow"; 
-      if (Level == 2) {ctx.fillStyle = "purple"; if (j == 15) {ctx.fillStyle = "yellow"}};
-      if (Level == 4) {ctx.fillStyle = "#e6ffff"};
-      if (Level == 3 || Level == 6) 
-        {ctx.drawImage(BlockImage, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
-      if (Level == 7) 
-        {ctx.drawImage(Farmer, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};
-    if (i == 5) 
-      {if (Level != 3) 
-        {ctx.drawImage(DuckImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}
-        else
-        {ctx.drawImage(Farmer, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};
-    if (i == 6) 
-      {ctx.drawImage(PigeonImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
-    if (i == 7) {if (Level == 1 || Level == 4 || Level == 6) 
-        {ctx.drawImage(AppImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
-        if (Level == 2) {
-        {ctx.drawImage(AppImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}}};
-    if (i == 8) 
-      {ctx.drawImage(Farmer, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
+  function RenderMap() {let I = Map.length;
+    for (let i = 1; i < I; i++) {let J = Map[i].length
+      for (let j = 0; j < J; j++) {
+      if (i == 1) {ctx.fillStyle = "darkcyan"; 
+        if (Level == 2 && j == 0) {ctx.fillStyle = "darkslategrey"};
+        if (Level == 3) {ctx.fillStyle = "orangered"};
+        if (Level == 4) {ctx.fillStyle = HexT};
+        if (Level == 5) {ctx.fillStyle = "#ffeb99"};
+        if (Level == 6) 
+          {ctx.drawImage(Hills, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}}; 
+      if (i == 2) {if (Level == 1 || Level == 2) {ctx.fillStyle = "green"}
+        if (Level == 4) {ctx.fillStyle = "goldenrod"}
+        if (Level == 5) 
+          {ctx.drawImage(DuckImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}
+        if (Level == 6) {ctx.fillStyle = "deeppink"}
+        if (Level == 7) {ctx.fillStyle = "white"}
+                  };
+      if (i == 3) {ctx.fillStyle = "brown";
+        if (Level == 3) 
+          {ctx.drawImage(PlatformImage[j], Map[i][j].x, Map[i][j].y, 
+            Map[i][j].width, Map[i][j].height)}
+        if (Level == 6) 
+          {ctx.drawImage(PlatformImage, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}
+        if (Level == 7) 
+          {ctx.drawImage(AppImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}
+                  }
+      if (i == 4) {ctx.fillStyle = "yellow"; 
+        if (Level == 2) {ctx.fillStyle = "purple"; if (j == 15) {ctx.fillStyle = "yellow"}};
+        if (Level == 3 || Level == 6) 
+          {ctx.drawImage(BlockImage, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
+        if (Level == 7) 
+          {ctx.drawImage(Farmer, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};
+      if (i == 5) 
+        {if (Level != 3) 
+          {ctx.drawImage(DuckImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}
+          else
+          {ctx.drawImage(Farmer, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};
+      if (i == 6) 
+        {ctx.drawImage(PigeonImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
+      if (i == 7) {if (Level == 1 || Level == 4 || Level == 6) 
+          {ctx.drawImage(AppImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)};
+          if (Level == 2) {
+          {ctx.drawImage(AppImage[j], Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}}};
+      if (i == 8) 
+        {if (j == 0) 
+          {ctx.drawImage(Farmer, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}
+         if (j == 1) 
+          {ctx.drawImage(FH, Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}
+        };
      
-    if ((Level == 1 || Level == 2 || Level == 4) && 0 < i && i < 5) 
-      {{ctx.fillRect(Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};
-    if (Level == 3 && i == 2) 
-      {{ctx.fillRect(Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};
-    if (Level == 5 && i != 2) 
-      {{ctx.fillRect(Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};
-    if ((Level == 6 || Level == 7) && i == 2) 
-      {{ctx.fillRect(Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};                                   
-                                           }                }
+      if ((Level == 1 || Level == 2 || Level == 4) && 0 < i && i < 5) 
+        {{ctx.fillRect(Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};
+      if (Level == 3 && i == 2) 
+        {{ctx.fillRect(Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};
+      if (Level == 5 && i != 2) 
+        {{ctx.fillRect(Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};
+      if ((Level == 6 || Level == 7) && i == 2) 
+        {{ctx.fillRect(Map[i][j].x, Map[i][j].y, Map[i][j].width, Map[i][j].height)}};                                   
+                                  }
+                                }
                        };                             
 
   // This function will be called when a key on the keyboard is pressed
@@ -503,15 +552,18 @@
   // 37 is the code for the left arrow key
   if(e.keyCode == 37) {keys.left = true};
   // 32 is the code for the spacebar
-  if (e.keyCode == 32) {if (Player.jump == false && Block != "hit") 
-      {if (Level != 7) {Player.y_v = -15} else {Player.y_v = -10}}  };
+  if (e.keyCode == 32) {keys.jump = true;
+    if (Player.jump == false && Block != "hit") 
+      {if (Level != 7) {Player.y_v = -15} else {Player.y_v = -10}}  
+                       };
   // 38 is the code for the up arrow key
   if(e.keyCode == 38) {keys.up = true};
   
   document.body.onkeyup = function(e) {if(e.keyCode == 38 && Player.jump) 
     // Flapping physics; each flap costs a stamina point (see chicken wing icon)
     {if (Player.Stamina > 0 && Block != "hit") 
-      {if (Level != 7) {Player.y_v = -10} else {Player.y_v = -3}; Player.Stamina--}}
+      {if (Level != 4 && Level != 7) {Player.y_v = -10} 
+       if (Level == 7) {Player.y_v = -3}; Player.Stamina--}}
                                       };
 
   // 39 is the code for the right arrow key
@@ -525,17 +577,18 @@
                       };
                     
   // Gotta replenish that stamina somehow, one point per five seconds seems fair
-  if (Level != 7) {setInterval(function () {if (Player.Stamina < 5 && keys.pause == false) 
-    {Player.Stamina++}}, 5000)}
+  if (Level != 4 && Level != 7) {setInterval(function () {if (Player.Stamina < 5 && keys.pause == false) 
+       {Player.Stamina++}                                }, 5000)}
   // When the chicken is old, the stamina count is lower and takes twice as long to replenish
-  else {setInterval(function () {if (Player.Stamina < 3) 
-    {if (Player.Active && keys.pause == false) {Player.Stamina++}}}, 10000)};
-                                                        
+  if (Level == 7) {setInterval(function () {if (Player.Stamina < 3) 
+    {if (Player.Active && keys.pause == false) {Player.Stamina++}}
+                                           }, 10000)
+                  };                                        
 
   // This function is called when the pressed key is released
   function keyup(e) {
   if (e.keyCode == 37) {keys.left = false};
-  if (e.keyCode == 32) {if(Player.y_v < -2) {Player.y_v = -3}};
+  if (e.keyCode == 32) {keys.jump = false; if(Player.y_v < -2) {Player.y_v = -3}};
   if (e.keyCode == 38) {keys.up = false};
   if (e.keyCode == 39) {keys.right = false};
   if (e.keyCode == 40) {keys.down = false};
@@ -556,17 +609,18 @@
     if (Level == 6) {if (Player.x - Map[2][0].x >= 512 &&
         Map[2][1].x + Map[2][1].width - Player.x >= 520) {Scroll[0] = true} else {Scroll[0] = false}};
     if (Level == 1) {if (Map[2][0].y - Player.y > 526 && Player.y - Map[4][9].y > 40) 
-      {Scroll[1] = true} else {Scroll[1] = false}};
+      {Scroll[1] = true} else {Scroll[1] = false}}
     if (Level == 2) 
       {if (Map[2][0].y - Player.y > 526 && Map[2][0].y - Player.y < 1675) 
-        {Scroll[1] = true} else {Scroll[1] = false}};
-    if (Level == 4 || Level == 6) 
-      {if (Map[2][0].y - Player.y > 526 && Map[1][0].y - Player.y < 4000) 
-        {Scroll[1] = true} else {Scroll[1] = false}};
+        {Scroll[1] = true} else {Scroll[1] = false}}
+    if (Level == 4) 
+      {if (Map[2][0].y - Player.y > 526 && Map[2][0].y - Player.y < 70000) 
+        {Scroll[1] = true} else {Scroll[1] = false}                       }
     if (Level == 3) 
-      {if (Map[2][0].y - Player.y > 526) {Scroll[1] = true} else {Scroll[1] = false}};
+      {if (Map[2][0].y - Player.y > 526) {Scroll[1] = true} else {Scroll[1] = false}}
     if (Level == 5) 
-      {if (Map[1][0].y - Player.y > 526) {Scroll[1] = true} else {Scroll[1] = false}};
+      {if (Map[1][0].y - Player.y > 526) {Scroll[1] = true} else {Scroll[1] = false}}
+    if (Level == 6) {if (Map[2][0].y - Player.y > 526) {Scroll[1] = true} else {Scroll[1] = false}}
     if (Level == 7) {Scroll[1] = false; if (Player.Stamina > 3) {Player.Stamina = 3}};
     if (Scroll[0] == false) {Player.x += Player.x_v};
     if (Scroll[1] == false) {Player.y += Player.y_v}
@@ -574,107 +628,109 @@
 
   // Horizontal collision check
   var Block = false;  
-  function Collision() {for (let i = 1; i < Map.length; i++) {                        
-    for (let j = 0; j < Map[i].length; j++) {
-      if (Level == 3 && i == 3) {if (Map[i][j].y + Map[i][j].height < Map[2][0].y) 
-        {Map[i][j].y_v = 5} else {Map[i][j].y_v = 0}                              };
+  function Collision() {let I = Map.length;
+    for (let i = 1; i < I; i++) {let J = Map[i].length;                       
+      for (let j = 0; j < J; j++) {
+        if (Level == 3 && i == 3) {if (Map[i][j].y + Map[i][j].height < Map[2][0].y) 
+                                   {Map[i][j].y_v = 5} else {Map[i][j].y_v = 0}     };
 
-      // Player x coordinate lies between those of map element
-      if (Map[i][j].x - Player.width < Player.x && Player.x < Map[i][j].x + Map[i][j].width) {                                               
-      // Player lands on element
-      if (Map[i][j].y - 10 < Player.y + Player.height && 
-          Player.y + Player.height <= Map[i][j].y + 10) {
-        if ((Level != 5 && Level != 7 && i >= 2 && i <= 4) || (Level == 7 && i == 2))     
-          {Player.jump = false; Player.y_v = 0; Player.y = Map[i][j].y - Player.height;
-           if (Level == 3 && i == 3) {if (Map[i][j].y > Map[4][0].y) {Map[i][j].y_v = -5}
-            else {Map[i][j].y_v = 0}; Player.y_v = Map[i][j].y_v; 
-                                     }                                                    };
-        if ((Level == 3 || Level == 5) && i == 1) {Player.jump = false; Player.y_v = 0; 
-          Player.y = Map[i][j].y - Player.height};
-        // 'Player.bounce = true' prevents Player from getting frozen by same enemy it bounces off
-        if (Level != 3 && Level != 6 && (i == 5 || i == 6)) {Player.bounce = true;
-        if (Level == 2 && i == 5 && j == 1) {Player.bounce = false}; 
-        if (Player.bounce) {Player.y_v = -15} }         };
-      // Player hits element from underneath
-      if (i == 4 && Map[i][j].y + Map[i][j].height - 10 < Player.y && 
-        Player.y < Map[i][j].y + Map[i][j].height - Player.y_v) {Player.y_v = 0};
-      // Player y coordinate lies between those of map element  
-      if (Map[i][j].y < Player.y + Player.height && Player.y < Map[i][j].y + Map[i][j].height) {
-        if (Level != 7 && i == 4) {Player.x_v = 0; 
-          if (Player.x < Map[i][j].x - Player.width + 5) {Player.x = Map[i][j].x - Player.width;
-            if (Scroll[0] == true && Player.x < 507) {Block = "right"}}; 
-          if (Player.x > Map[i][j].x+Map[i][j].width - 5) {Player.x = Map[i][j].x+Map[i][j].width;
-            if (Scroll[0] == true && Player.x > 517) {Block = "left"}}};
-        if (Level != 3 && Level != 6 && (i == 5 || i == 6) && Player.bounce == false) 
-          {Player.x_v = 0; Block = "hit"};
-        if (Level == 6 && (i == 5 || i == 6)) {Player.x_v = 10};  
-        if (Level != 6 && i == 1 && keys.up) {Player.y_v = -10};                                      
-        if (Level == 1 && i == 7 && keys.down)  
-          { Level++; Map = []; LevelLoad(); 
-            Map = JSON.parse(JSON.stringify(MapSpec)); // Level 1 --> 2 transition
-            x_b = JSON.parse(JSON.stringify(X_b2)); y_b = JSON.parse(JSON.stringify(Y_b2)); 
-            Player.x = Map[0].x; Player.y = Map[0].y; Player.Stamina = -2; Player.Surprised = false;
-            ReverseT = 1000
-          };              
-        if (Level == 1 && Player.y < 0)
-          { Level++; Map = []; LevelLoad(); 
-            Map = JSON.parse(JSON.stringify(MapSpec)); // Level 1 --> 2 transition
-            x_b = JSON.parse(JSON.stringify(X_b2)); y_b = JSON.parse(JSON.stringify(Y_b2)); 
-            Player.x = Map[0].x; Player.y = Map[0].y; Player.Stamina = -2; Player.Surprised = false;
-            ReverseT = 1000
-          };  
-       /* { Background[0].src = "BackgroundL4.jpg"; Level = 4; Map = []; LevelLoad(); 
-            Map = JSON.parse(JSON.stringify(MapSpec)); // Level 1 --> 4 transition
-            x_b = JSON.parse(JSON.stringify(X_b1[3])); y_b = JSON.parse(JSON.stringify(Y_b1[3])); 
-            Player.x = Map[0].x; Player.y = Map[0].y; Player.Stamina = 5;
-            Player.width = 100; Player.height = 100; ReverseT = 1000
-          }; */ 
-        if (Level == 2 && i == 7 && j == 8) {Player.Stamina = 5}; // Stamina replenishment          
-        if (Level == 2 && i == 7 && j == 1 && keys.up) // Level 2 --> 3 transition
-          { Water = []; Ground = []; Platform = []; Obstacle = []; Apparition = [];
-            Level++; Map = []; LevelLoad(); 
-            x_b = JSON.parse(JSON.stringify(X_b3)); y_b = JSON.parse(JSON.stringify(Y_b3));
-            Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
-            Player.width = 100; Player.height = 100; 
-            Player.Stamina = 5; T = [3, 0]
-          };
-        if (Level == 3 && T[0] == [0] && T[1] == [0]) // Level 3 --> 7 transition
-          { Text = []; Water = []; Ground = []; Platform = []; Obstacle = []; Apparition = [];
-            Level = 7; Map = []; LevelLoad(); 
-            x_b = JSON.parse(JSON.stringify(X_b7)); y_b = JSON.parse(JSON.stringify(Y_b7));
-            Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
-            Player.Lives = 0; Player.Stamina = 3; t = 0 
-          };
-        if (Level == 2 && i == 7 && j == 2 && keys.up) 
-          { Water = []; Ground = []; Platform = []; Obstacle = []; Apparition = [];
-            Level++; Map = []; LevelLoad(); // Level 2 --> 3 transition
-            x_b = JSON.parse(JSON.stringify(X_b3)); y_b = JSON.parse(JSON.stringify(Y_b3));
-            Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
-            Player.width = 100; Player.height = 100; 
-            Player.Stamina = 5; T = [3, 0];
-          };
-       /* { Background[0].src = "BackgroundL6.jpg"; // Level 2 --> 6 transition
-            Water = []; Ground = []; Platform = []; Obstacle = []; Apparition = [];
-            Level = 6; Map = []; LevelLoad(); 
-            x_b = JSON.parse(JSON.stringify(X_b1[5])); y_b = JSON.parse(JSON.stringify(Y_b1[5]));
-            Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
-            Player.Stamina = 5; ReverseT = 1000   
-          }; */
-        if (Level == 4 && Player.x - Map[1][0].x > 5900)  
-           {Background[0].src = "BackgroundL5.jpg"; 
-            Water = []; Ground = []; Platform = []; Obstacle = []; Apparition = []; Predator = [];
-            Level++; Map = []; LevelLoad(); 
-            Map = JSON.parse(JSON.stringify(MapSpec)); // Level 4 --> 5 transition
-            x_b = JSON.parse(JSON.stringify(X_b1[4])); y_b = JSON.parse(JSON.stringify(Y_b1[4])); 
-            Player.x = Map[0].x; Player.y = Map[0].y; Player.Stamina = 5;
-            Player.Surprised = false
-           };
-        if (Level == 6 && Map[7][0].x < Player.x && Player.x < Map[7][0].x + Map[7][0].width &&
-          Map[7][0].y < Player.y && Player.y < Map[7][0].y + Map[7][0].height && keys.up)
-           {Game = "Over"}           
-                                                                                             }                                                   
-                                                                                             }                
-                                            }                }
+        // Player x coordinate lies between those of map element
+        if (Map[i][j].x - Player.width < Player.x && Player.x < Map[i][j].x + Map[i][j].width) {                                               
+        // Player lands on element
+        if (Map[i][j].y - 10 < Player.y + Player.height && 
+            Player.y + Player.height <= Map[i][j].y + 10) {
+          if (Level == 4 && i == 1) {if (keys.up) {Player.y_v = -1}
+            else {Player.y_v = 0; Player.y = Map[i][j].y - Player.height}
+                                    }    
+          if ((Level != 5 && Level != 7 && i >= 2 && i <= 4) || (Level == 7 && i == 2))     
+            {Player.jump = false; Player.y_v = 0; Player.y = Map[i][j].y - Player.height;
+             if (Level == 3 && i == 3) {if (Map[i][j].y > Map[4][0].y) {Map[i][j].y_v = -5}
+              else {Map[i][j].y_v = 0}; Player.y_v = Map[i][j].y_v; 
+                                       }                                                   };
+          if ((Level == 3 || Level == 5) && i == 1) {Player.jump = false; Player.y_v = 0; 
+            Player.y = Map[i][j].y - Player.height};
+          // 'Player.bounce = true' prevents Player from getting frozen by same enemy it bounces off
+          if (Level != 3 && Level != 4 && Level != 6 && (i == 5 || i == 6)) 
+          {Player.bounce = true;
+           if (Level == 2 && i == 5 && j == 1) {Player.bounce = false}; 
+           if (Player.bounce) {Player.y_v = -15}                       }          
+                                                          };
+        // Player hits element from underneath
+        if (i == 4 && Map[i][j].y + Map[i][j].height - 15 < Player.y && 
+            Player.y < Map[i][j].y + Map[i][j].height - Player.y_v     ) {Player.y_v = 0};
+        // Player y coordinate lies between those of map element  
+        if (Map[i][j].y < Player.y + Player.height && Player.y < Map[i][j].y + Map[i][j].height) {
+          if (Level != 7 && i == 4) {Player.x_v = 0; 
+            if (Player.x < Map[i][j].x - Player.width + 5) {Player.x = Map[i][j].x - Player.width;
+              if (Scroll[0] == true && Player.x < 507) {Block = "right"}}; 
+            if (Player.x > Map[i][j].x+Map[i][j].width - 5) {Player.x = Map[i][j].x+Map[i][j].width;
+              if (Scroll[0] == true && Player.x > 517) {Block = "left"}}};
+          if (((Level!=3 && Level!=4 && Level!=6 && (i==5 || i==6)) || (Level==4 && i==6)) 
+              && Player.bounce == false) {Player.x_v = 0; Block = "hit"};
+          if (Level == 4 && i == 5) {Player.x_v += 1};
+          if (Level == 6 && (i == 5 || i == 6)) {Player.x_v = 10};  
+          if (Level != 4 && Level != 6 && i == 1 && keys.up) {Player.y_v = -10};                                      
+          if (Level == 1 && i == 7 && keys.down)  
+            { Level++; Map = []; LevelLoad(); 
+              Map = JSON.parse(JSON.stringify(MapSpec)); // Level 1 --> 2 transition
+              x_b = JSON.parse(JSON.stringify(X_b2)); y_b = JSON.parse(JSON.stringify(Y_b2)); 
+              Player.x = Map[0].x; Player.y = Map[0].y; Player.Stamina = -2; Player.Surprised = false;
+              ReverseT = 1000
+            };              
+          if (Level == 1 && Player.y < 0) {// Level 1 --> 4 transition
+            Level = 4; LevelLoad(); Map = JSON.parse(JSON.stringify(MapSpec)); SceneL4 = 0;
+            x_b = JSON.parse(JSON.stringify(X_b4)); y_b = JSON.parse(JSON.stringify(Y_b4)); 
+            Player.x = Map[0].x; Player.y = Map[0].y; Player.Stamina = 0;
+            Player.width = 162; Player.height = 104; ReverseT = 1000; 
+            Chicken.src = "ChickenGlideR2.gif"
+                                          };   
+          if (Level == 2 && i == 7 && j == 8) {Player.Stamina = 5}; // Stamina replenishment          
+          if (Level == 2 && i == 7 && j == 1 && keys.up) // Level 2 --> 3 transition
+            { Water = []; Ground = []; Platform = []; Obstacle = []; Apparition = [];
+              Level++; Map = []; LevelLoad(); 
+              x_b = JSON.parse(JSON.stringify(X_b3)); y_b = JSON.parse(JSON.stringify(Y_b3));
+              Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
+              Player.width = 100; Player.height = 100; 
+              Player.Stamina = 5; T = [3, 0]
+            };
+          if (Level == 3 && T[0] == [0] && T[1] == [0]) // Level 3 --> 7 transition
+            { Text = []; Water = []; Ground = []; Platform = []; Obstacle = []; Apparition = [];
+              Level = 7; Map = []; LevelLoad(); 
+              x_b = JSON.parse(JSON.stringify(X_b7)); y_b = JSON.parse(JSON.stringify(Y_b7));
+              Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
+              Player.Lives = 0; Player.Stamina = 3; t = 0 
+            };
+          if (Level == 2 && i == 7 && j == 2 && keys.up) 
+            { Water = []; Ground = []; Platform = []; Obstacle = []; Apparition = [];
+              Level++; Map = []; LevelLoad(); // Level 2 --> 3 transition
+              x_b = JSON.parse(JSON.stringify(X_b3)); y_b = JSON.parse(JSON.stringify(Y_b3));
+              Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
+              Player.width = 100; Player.height = 100; 
+              Player.Stamina = 5; T = [3, 0];
+            };
+         /* { Background[0].src = "BackgroundL6.jpg"; // Level 2 --> 6 transition
+              Water = []; Ground = []; Platform = []; Obstacle = []; Apparition = [];
+              Level = 6; Map = []; LevelLoad(); 
+              x_b = JSON.parse(JSON.stringify(X_b1[5])); y_b = JSON.parse(JSON.stringify(Y_b1[5]));
+              Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
+              Player.Stamina = 5; ReverseT = 1000   
+            }; */
+    /*  if (Level == 4 && Player.x - Map[1][0].x > 5900)  
+             {Background[0].src = "BackgroundL5.jpg"; 
+              Water = []; Ground = []; Platform = []; Obstacle = []; Apparition = []; Predator = [];
+              Level++; Map = []; LevelLoad(); 
+              Map = JSON.parse(JSON.stringify(MapSpec)); // Level 4 --> 5 transition
+              x_b = JSON.parse(JSON.stringify(X_b1[4])); y_b = JSON.parse(JSON.stringify(Y_b1[4])); 
+              Player.x = Map[0].x; Player.y = Map[0].y; Player.Stamina = 5;
+              Player.Surprised = false
+             }; */
+          if (Level == 6 && Map[7][0].x < Player.x && Player.x < Map[7][0].x + Map[7][0].width &&
+            Map[7][0].y < Player.y && Player.y < Map[7][0].y + Map[7][0].height && keys.up)
+             {Game = "Over"}           
+                                                                                                 }                                                   
+                                                                                               }                
+                                  }                
+                                }
                        };
 
   // Flying mobs switch direction every five seconds
@@ -682,13 +738,49 @@
   if (Level == 1 || Level == 2 || Level == 4 || Level == 6) {setInterval(() => {
     if (keys.pause == false) {ReverseT--}}, 1)};         
   
-  function Reverse() {if (ReverseT <= 0) {ReverseT += 1000;
-    for (let p = 0; p < Map[6].length; p++) {Map[6][p].y_v *= -1}}};
+  function Reverse() {let P = Map[6].length;
+    if (ReverseT <= 0) {ReverseT += 1000;
+      for (let p = 0; p < P; p++) {Map[6][p].y_v *= -1}
+                       }
+                     };
+
+  var HexR; var HexG; var HexB; var HexT;
+  var Hex1; var Hex2; var Hex3; var Hex4;
 
   function ScrollFunction() {
     if (Level == 1) {x_b[1]++}
     if (Level == 2) {if (x_b[1] < -1976) {x_b[1]++} else {x_b[1] -= 3000}}
-    if (Level == 3) {y_b[0] += 0.165};
+    if (Level == 3) {y_b[0] += 0.165}
+    if (Level == 4) {if (x_f[1] > -4976) {x_f[1]++} else {x_f[1] += 3000};
+      
+      HexR = Math.round(50).toString(16);
+      HexG = Math.round(50 + ((Player.x - Map[2][0].x) / 4000)).toString(16);
+      HexB = Math.round(50 + ((Player.x - Map[2][0].x) / 800)).toString(16);
+      HexT = "#" + HexR + HexG + HexB; 
+      
+      if (Player.x - Map[8][0].x < 10000) {
+        Hex1 = Math.round(50 + ((Player.x - Map[8][0].x) / 50)).toString(16);
+        Hex2 = Math.round(0).toString(16); 
+        Hex3 = Math.round(0).toString(16) };      
+      if (10000 <= Player.x - Map[8][0].x && Player.x - Map[8][0].x < 30000) {
+        Hex1 = Math.round(250).toString(16);
+        Hex2 = Math.round((Player.x - Map[8][0].x - 10000) / 80).toString(16); 
+        Hex3 = Math.round(0).toString(16)                                    };
+      if (30000 <= Player.x - Map[8][0].x && Player.x - Map[8][0].x < 50000) {
+        Hex1 = Math.round(250 - ((Player.x - Map[8][0].x - 30000) / 80)).toString(16);
+        Hex2 = Math.round(250).toString(16); 
+        Hex3 = Math.round(0).toString(16)                                    };  
+      if (50000 <= Player.x - Map[8][0].x) {
+        Hex1 = Math.round((Player.x - Map[8][0].x - 50000) / 100).toString(16);
+        Hex2 = Math.round(250).toString(16); 
+        Hex3 = Math.round((Player.x - Map[8][0].x - 50000) / 100).toString(16)  
+                                           };
+      if (Hex1.length == 1) {Hex1 = "0" + Hex1}
+      if (Hex2.length == 1) {Hex2 = "0" + Hex2}
+      if (Hex3.length == 1) {Hex3 = "0" + Hex3};                                        
+      if (Player.x < Map[2][1].x || Player.jump) {Hex4 = "#" + Hex1 + Hex2 + Hex3} 
+      else {Hex4 = "white"}                                        
+                    };
 
     // Disable Block two seconds after frozen by enemy
     if (Block == "hit") {
@@ -713,7 +805,7 @@
         if (Map[3][l].y_v > 0) {PlatformImage[l].src = "Lift-Drop.gif"} 
                                   }
      };
-    if (Scroll[0] == true) {
+    if (Scroll[0] == true) {let I = Map.length;
       // The below two lines disable Block when Player y coordinates exceed those of obstacle
       if (Player.x < 512) {Player.x++}; if (Player.x > 512) {Player.x--};
       if (Block == "right" && Player.x > 510 || Block == "left" && Player.x < 514) {Block = false};
@@ -721,56 +813,65 @@
       if (Player.bounce == true) {setTimeout(function() {Player.bounce = false}, 50)};
 
       // Stage horizontally scrolls with player, by moving map opposite to player's velocity  
-      for (let i = 0; i < Map.length; i++) 
-        {for (let j = 0; j < Map[i].length; j++) {if (Block == false || 
-          Block == "right" && Player.x_v < 0 || Block == "left" && Player.x_v > 0) 
-          {if ((Level != 4 && Level != 6) || (Level == 4 && i != 7) || (Level == 6 && i != 1)) 
-            {Map[i][j].x -= Player.x_v; Block = false};
-           if (Level == 6 && i == 1) {Map[i][j].x -= 0.4*Player.x_v; Block = false}}}};
+      for (let i = 0; i < I; i++) {let J = Map[i].length;
+        for (let j = 0; j < J; j++) {
+          if (Block==false || Block=="right" && Player.x_v<0 || Block=="left" && Player.x_v>0) { 
+            if ((Level!=4 && Level!=6) || (Level==4 && [i,j]!=[7,0]) || (Level==6 && i!=1)) 
+            {Map[i][j].x -= Player.x_v; Block = false}
+            if (Level == 6 && i == 1) {Map[i][j].x -= 0.4*Player.x_v; Block = false}           }
+                                    }
+                                  };
       if (Block == false) {
         if (Level == 1) {x_b[1] -= 0.125*Player.x_v; // Moving the background
-          x_b[2] -= 0.25*Player.x_v; x_b[3] -= 0.5*Player.x_v}; 
+          x_b[2] -= 0.25*Player.x_v; x_b[3] -= 0.5*Player.x_v} 
         if (Level == 2) {x_b[1] -= 0.125*Player.x_v; 
-          x_b[2] -= 0.25*Player.x_v; x_b[3] -= 0.33*Player.x_v};
-        if (Level == 3) {x_b[1] -= 0.25*Player.x_v; x_b[2] -= 0.5*Player.x_v};
-        if (Level == 4) {x_b -= 0.19*Player.x_v};
-        if (Level == 5) {x_b -= 0.15*Player.x_v};
-        if (Level == 6) {y_b -= 0.25*Player.x_v};
+                         x_b[2] -= 0.25*Player.x_v; x_b[3] -= 0.33*Player.x_v}
+        if (Level == 3) {x_b[1] -= 0.25*Player.x_v; x_b[2] -= 0.5*Player.x_v}
+        if (Level == 4) {x_b[2] -= 0.025*Player.x_v; x_b[3] -= 0.025*Player.x_v; 
+                         x_b[4] -= 0.013*Player.x_v; x_f[1] -= 0.125*Player.x_v } 
+        if (Level == 5) {x_b -= 0.15*Player.x_v}
+        if (Level == 6) {y_b -= 0.25*Player.x_v}
         if (Level == 7) {x_b[1] -= 0.15*Player.x_v; x_b[2] -= 0.4*Player.x_v}
                           }};                                                                                  
 
     // Level 4 exclusive mechanic: Shark x coordinate aligns with player's
     if (Level == 4) 
-      {if (Player.x < Map[2][1].x - Player.width) 
-        {Map[7][0].x = Player.x} else {Map[7][0].x = Map[2][1].x - Map[7][0].width}}                       
+      {if (Map[2][0].x + Map[2][0].width < Player.x && Player.x < Map[2][1].x - Player.width) 
+        {Map[7][0].x = Player.x + 50} else {
+          if (Player.x > Map[2][1].x-1000) {Map[7][0].x = Map[2][1].x - Map[7][0].width}
+          else {Map[7][0].x = Map[2][0].x + Map[2][0].width}
+                                      }
+      }                       
 
-    if (Scroll[1] == false) {if (Player.y + Player.height > 556) {
-      for (let i = 0; i < Map.length; i++) {
-        for (let j = 0; j < Map[i].length; j++) {Map[i][j].y--}
+    if (Scroll[1] == false) {if (Player.y + Player.height > 556) {let I = Map.length;
+      for (let i = 0; i < I; i++) {let J = Map[i].length;
+        for (let j = 0; j < J; j++) {Map[i][j].y--}
                                            }                     }};
 
     if (Scroll[1] == true) {
       if (Player.y < 30) {Player.y++}; // Don't want the player to disappear off-stage
 
       // Stage vertically scrolls with player, by moving map opposite to player's velocity  
-      if (Level == 1) {for (let i = 0; i < 8; i++) 
-        {for (let j = 0; j < Map[i].length; j++) {Map[i][j].y -= Player.y_v}};
+      if (Level == 1) {for (let i = 0; i < 8; i++) {let J = Map[i].length;
+          for (let j = 0; j < J; j++) {Map[i][j].y -= Player.y_v}         };
         {y_b[1] -= 0.05*Player.y_v; // Moving the background
          y_b[2] -= 0.25*Player.y_v; y_b[3] -= 0.5*Player.y_v}}; 
-      if (Level == 2) {for (let i = 0; i < Map.length; i++) 
-        {for (let j = 0; j < Map[i].length; j++) {Map[i][j].y -= Player.y_v}};
+      if (Level == 2) {for (let i = 0; i < 8; i++) {let J = Map[i].length;
+          for (let j = 0; j < J; j++) {Map[i][j].y -= Player.y_v}};
          y_b[1] -= 0.05*Player.y_v; // Moving the background
          y_b[2] -= 0.25*Player.y_v; y_b[3] -= Player.y_v};
-      if (Level == 3) {for (let i = 0; i < 6; i++) 
-        {for (let j = 0; j < Map[i].length; j++) {Map[i][j].y -= Player.y_v}}; 
+      if (Level == 3) {for (let i = 0; i < 6; i++) {let J = Map[i].length;
+          for (let j = 0; j < J; j++) {Map[i][j].y -= Player.y_v}}; 
         y_b[1] -= 0.25*Player.y_v; y_b[2] -= 0.5*Player.y_v};
-      if (Level == 4) {for (let i = 0; i < 8; i++) 
-        {for (let j = 0; j < Map[i].length; j++) {Map[i][j].y -= Player.y_v}};
-        if (Block == false) {y_b -= 0.95*Player.y_v}};
-      if (Level == 5) {for (let i = 0; i < 3; i++) 
-        {for (let j = 0; j < Map[i].length; j++) {Map[i][j].y -= Player.y_v}}; y_b -= 1.6*Player.y_v};
-      if (Level == 6) {Map[1][0].y -= 0.5*Player.y_v; for (let i = 2; i < 8; i++) 
-        {for (let j = 0; j < Map[i].length; j++) {Map[i][j].y -= Player.y_v}}};         
+      if (Level == 4) {for (let i = 0; i < 8; i++) {let J = Map[i].length;
+          for (let j = 0; j < J; j++) {Map[i][j].y -= Player.y_v}};
+        y_b[0] -= 0.06*Player.y_v; y_b[2] -= 0.2*Player.y_v; y_b[3] -= 0.4*Player.y_v;
+        y_b[4] -= 0.2*Player.y_v; y_f[0] -= 0.2*Player.y_v; y_f[1] -= 0.3*Player.y_v
+                      };
+      if (Level == 5) {for (let i = 0; i < 3; i++) {let J = Map[i].length;
+          for (let j = 0; j < J; j++) {Map[i][j].y -= Player.y_v}}; y_b -= 1.6*Player.y_v};
+      if (Level == 6) {Map[1][0].y -= 0.5*Player.y_v; for (let i = 2; i < 8; i++) {let J = Map[i].length;
+          for (let j = 0; j < J; j++) {Map[i][j].y -= Player.y_v}}};         
                            }}; 
 
   function PlayerMotion() {
@@ -799,49 +900,128 @@
 
     // Emergency brakes! <:-O
     if (Level == 6 && Player.x > 550 && Player.x_v > 2.5) {Player.x_v = 2.5};
-                          };                              
+                          };  
+                
+  var Speed = Math.sqrt(Player.x_v**2 + Player.y_v**2);
+  var Gradient = Player.y_v / Player.x_v;                        
+
+  function Glide() {if (Player.jump) {Player.y_v += 0.4*gravity} 
+    else {if (keys.right && Player.x_v < 1) {Player.x_v = 1};
+          if (Player.jump == false && keys.jump) {Player.y_v = -10; Player.jump = true}};
+    if (keys.up) {
+      if (Player.x_v > 0.5) {Player.y_v -= 0.3;
+        if (Player.y_v > 0.5) {Player.x_v += 0.3*Player.y_v; Player.y_v -= 0.1*Player.x_v}
+        if (Player.y_v < 0.5) {Player.x_v -= 0.1}
+                            }
+      if (Player.x_v < 0.5) {
+        if (Player.y_v > 0.5) {Player.x_v += 0.1; Player.y_v -= 0.1}
+                           }                     
+                 }
+    if (keys.down) {
+      if (Player.y_v < 0) {Player.x_v += 0.1; Player.y_v += 0.1}
+      if (Player.x_v > 0.1 && Player.y_v >= 0) {Player.x_v -= 0.1; Player.y_v += 0.1}
+                   }
+    
+    if (Player.x > Map[2][1].x) {Player.Active = false;
+      if (Player.jump) {Player.y_v = ((Map[1][0].y - Player.y) / 100) + 1;
+        if (Map[1][0].y - Player.y > 500) {Player.x_v = 40*(1 -(Map[1][0].y - Player.y)/50000)}
+                       }        
+      else {if (Player.x_v >= 60) {Player.x_v *= 0.999}
+        if (10 <= Player.x_v && Player.x_v < 60) {Player.x_v *= 0.99} 
+        if (Player.x_v < 10) {Player.x_v *= 0.9}
+        if (Player.x_v < 0.01) {Player.x_v = 0}    
+           }                    }
+                   };                        
                        
   function MobMotion() {
-    if (Level != 3 && Level != 5 && Level != 6 && Level != 7) {
-    for (let d = 0; d < Map[5].length; d++) {Map[5][d].x += Map[5][d].x_v;
+    if (Level < 3) {let D = Map[5].length;
+    for (let d = 0; d < D; d++) {Map[5][d].x += Map[5][d].x_v;
     Map[5][d].y++;
-    for (let i = 2; i < 5; i++) {for (let j = 0; j < Map[i].length; j++) {
-      // Duck x coordinate lies between those of solid element
-      if (Map[i][j].x - Map[5][d].width < Map[5][d].x && 
-        Map[5][d].x < Map[i][j].x + Map[i][j].width) 
-        {// Duck y coordinate lies between those of solid element 
-        if (i == 4 && Map[i][j].y + 10 < Map[5][d].y + Map[5][d].height 
-          && Map[5][d].y < Map[i][j].y + Map[i][j].height) {Map[5][d].x_v *= -1};
-        // Duck y coordinate lies directly above those of solid element
-      if (Map[i][j].y < Map[5][d].y + Map[5][d].height && 
-      Map[5][d].y + Map[5][d].height <= Map[i][j].y + 10) {
-        Map[5][d].y = Map[i][j].y - Map[5][d].height
-                                                          }              
-        }                                                                }     
-                                }                               }
-                                                              };
+    for (let i = 2; i < 5; i++) {let J = Map[i].length;
+      for (let j = 0; j < J; j++) {
+        // Duck x coordinate lies between those of solid element
+        if (Map[i][j].x - Map[5][d].width < Map[5][d].x && 
+          Map[5][d].x < Map[i][j].x + Map[i][j].width) 
+          {// Duck y coordinate lies between those of solid element 
+          if (i == 4 && Map[i][j].y + 10 < Map[5][d].y + Map[5][d].height 
+            && Map[5][d].y < Map[i][j].y + Map[i][j].height) {Map[5][d].x_v *= -1};
+          // Duck y coordinate lies directly above those of solid element
+        if (Map[i][j].y < Map[5][d].y + Map[5][d].height && 
+        Map[5][d].y + Map[5][d].height <= Map[i][j].y + 10) {
+          Map[5][d].y = Map[i][j].y - Map[5][d].height
+                                                            }              
+          }                       }     
+                                }
+                                }
+                   };
 
     if (Level == 5) {for (let d = 0; d < 9; d++) {Map[2][d].x += Map[2][d].x_v;
       Map[2][d].y++;
-      for (let g = 0; g < Map[1].length; g++) {
         // Chicken x coordinate lies between those of solid element
-        if (Map[1][g].x - Map[2][d].width < Map[2][d].x && 
-          Map[2][d].x < Map[1][g].x + Map[1][g].width)       {
+        if (Map[1][0].x - Map[2][d].width < Map[2][d].x && 
+          Map[2][d].x < Map[1][0].x + Map[1][0].width)       {
           // Chicken y coordinate lies directly above those of solid element
-            if (Map[1][g].y < Map[2][d].y + Map[2][d].height && 
-            Map[2][d].y + Map[2][d].height <= Map[1][g].y + 10) 
-              {Map[2][d].y = Map[1][g].y - Map[2][d].height} }                                                                     
-                                              }              }
+            if (Map[1][0].y < Map[2][d].y + Map[2][d].height && 
+            Map[2][d].y + Map[2][d].height <= Map[1][0].y + 10) 
+              {Map[2][d].y = Map[1][0].y - Map[2][d].height} }                                                                     
+                                                 }
                     };                            
       // Flying physics for flying mobs
-      if (Level != 3 && Level != 5 && Level != 7) {
-        for (let p = 0; p < Map[6].length; p++) {Map[6][p].y += Map[6][p].y_v}}
-      if (Level == 3) {for (let p = 0; p < Map[3].length; p++) {Map[3][p].y += Map[3][p].y_v}}                        
+      if (Level != 3 && Level != 5 && Level != 7) {let P = Map[6].length;
+        for (let p = 0; p < P; p++) {Map[6][p].y += Map[6][p].y_v}}
+      if (Level == 3) {for (let p = 0; p < 2; p++) {Map[3][p].y += Map[3][p].y_v}}
+      
+      // Shark jump call
+      if (Level == 4) {Map[7][0].y += Map[7][0].y_v;
+        if (Map[1][0].y - Player.y < 500 && Map[7][0].mode == 0 &&
+            Map[2][0].x + Map[2][0].width < Player.x && Player.x < Map[2][1].x - Player.width) 
+        {Map[7][0].mode = 1};
+                      }
                        };
+
+  function Snatch() {
+    if (Map[7][0].mode == 1) {Map[7][0].y_v = 1; 
+                              if (Map[7][0].y > Map[1][0].y + 50) {Map[7][0].mode = 2}} 
+    if (Map[7][0].mode == 2) {Map[7][0].y_v -= 0.5;
+                              if (Map[7][0].y < Map[1][0].y - 200) {Map[7][0].mode = 3}}
+    if (Map[7][0].mode == 3) {Map[7][0].y_v += gravity;
+                              if (Map[7][0].y > Map[1][0].y - 100 && Map[7][0].y_v > 2) 
+                                {Map[7][0].mode = 4}                                 }
+    if (Map[7][0].mode == 4) {if (Map[7][0].y_v > -1) {Map[7][0].y_v--};
+                              if (Map[7][0].y <= Map[1][0].y - 120) 
+                              {Map[7][0].y_v = 0; Map[7][0].mode = 0}   }                                                                                
+                     };
+
+  var SceneL4; 
+  let Glider = new Image(); Glider.src = "Glider.gif"; let Gx = 600;                  
+  function CutsceneL4() {
+    if (SceneL4 == 0) {AppImage[127].src = "TruckFLA1.gif"; Map[7][127].x = Player.x + 500;
+                       Icon[0].src = "Icon_Clock.gif"; SceneL4 = 1                         }
+    if (SceneL4 == 1) {AppImage[127].src = "TruckFLA1.gif"; 
+                       if (Player.x < Map[7][127].x + 220) {Map[7][127].x--}; 
+                       if (Player.x == Map[7][127].x + 220) 
+                       {AppImage[127].src = "TruckFLA2.gif"; SceneL4 = 2; 
+                        Icon[0].src = "Icon_Click1.gif"                  }                                    
+                      }
+    if ((2 <= SceneL4 && SceneL4 < 14) || (17 <= SceneL4 && SceneL4 < 23) || 
+        (24 <= SceneL4 && SceneL4 < 57)                                     ) 
+    {canvas.onclick = () => {SceneL4++}};
+    if ((14 <= SceneL4 && SceneL4 <= 16) || SceneL4 == 23) {canvas.onclick = []; 
+                                                            Icon[0].src = "Icon_Clock.gif"}
+    if (SceneL4 == 14) {Map[8][0].x = 300; Map[8][0].y = -1000; 
+                        setTimeout(() => {SceneL4 = 15}, 1000) }
+    if (SceneL4 == 15) {setTimeout(() => {SceneL4 = 16}, 1000)}
+    if (SceneL4 == 16) {if (Map[8][0].y < 450) {Map[8][0].y += 5} 
+      else {SceneL4 = 17; Icon[0].src = "Icon_Click1.gif"}       }
+    if (SceneL4 == 23) {setTimeout(() => {SceneL4 = 24; Icon[0].src = "Icon_Click1.gif"}, 3000)}  
+                        }                          
   
   // "I'm gonna get you!" >:-D                   
   function Sweep() {
-    if (Level == 1 || Level == 4 || Level == 6) {Map[8][0].x += Map[8][0].x_v}
+    if (Level == 1) {Map[8][0].x += Map[8][0].x_v; Map[8][1].x += Map[8][1].x_v}
+    if (Level == 4 && Player.x < Map[2][1].x) {Map[8][0].x += Map[8][0].x_v}
+    if (Level == 4) {if (Player.Active) {Map[8][0].y = Player.y - 40}}
+    if (Level == 6) {Map[8][0].x += Map[8][0].x_v}
     if (Level == 7) {if (Player.x - Map[4][0].x > 500) {Map[4][0].x += 1.5}}
                    };
 
@@ -865,11 +1045,12 @@
                     };
                                   
     if (Level == 4) {
-      if ((Player.x < Map[2][1].x && Player.y > Map[7][0].y) || 
+      if ((Map[2][0].x+Map[2][0].width<Player.x && Player.x<Map[2][1].x && Player.y>Map[7][0].y) || 
           Player.x < Map[8][0].x + 0.5*Map[8][0].width) {
         Map = JSON.parse(JSON.stringify(MapSpec)); Player.x = Map[0].x; Player.y = Map[0].y;
-        Player.x_v = 0; Player.y_v = 0; Player.Lives--; Player.Stamina = 5; Block = false; 
-        x_b = JSON.parse(JSON.stringify(X_b1[3])); y_b = JSON.parse(JSON.stringify(Y_b1[3]));          
+        Player.x_v = 0; Player.y_v = 0; Player.Lives--; Block = false; 
+        x_b = JSON.parse(JSON.stringify(X_b4)); y_b = JSON.parse(JSON.stringify(Y_b4));
+        x_f = JSON.parse(JSON.stringify(X_f4)); y_f = JSON.parse(JSON.stringify(Y_f4));          
         ReverseT = 1000                                 }  
                     }                                         
                    };
@@ -964,20 +1145,221 @@
           {Text = ["Go to hell!"]; SpeechBox[1].src = "SpeechIcon_Chicken2.gif"}                  
                      }                              
                     };
-    if (Level == 4) {if (Player.x <= 400) {Text = "--> Sky Chase! -->"};
-      if (Player.x - Map[1][0].x > 1000 && Player.x - Map[1][0].x < 1500) 
-        {Text = "There's a hungry shark stalking you in the sea below, so don't fall"};
-      if (Player.x - Map[1][0].x > 1500 && Player.x - Map[1][0].x < 2800) 
-        {Text = ""};
-      if (Player.x - Map[1][0].x > 2800  && Player.x - Map[1][0].x < 3500) 
-        {Text = "You'll have to make a leap of faith, as far right as you can go"};
-      if (Player.x - Map[1][0].x > 3500 && Player.x < 4500) 
-        {Text = ""};
-      if (Player.x - Map[1][0].x > 4500 && Player.x < 5500) 
-        {Text = "Thank you for flying with Fryanair"};
-      if (Player.x - Map[1][0].x > 5500) 
-        {Text = "Keep heading and spamming Right as the eagle approaches to progress."}
+    if (Level == 4) {
+      if (Player.x - Map[2][0].x <= 1000) {Text = []}
+      if (1000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 3000) {
+        Text = ["Cruise higher, that shark can leap out of water!"]; 
+        SpeechBox[1].src = "SpeechIcon_Eagle1.gif"                         }
+      if (3000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 7000) {
+        Text = ["Cruise lower, that's where the speed boosts are!",
+                "You cannot outrun the eagle at high altitudes!"   ]; 
+        SpeechBox[1].src = "SpeechIcon_Shark1.gif"                         } 
+      if (7000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 9000) {
+        Text = ["Shut up! I have a nest of chicks to feed!"]; 
+        SpeechBox[1].src = "SpeechIcon_Eagle2.gif"                         }
+      if (9000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 10000) 
+        {Text = ["You sure about that?"]; SpeechBox[1].src = "SpeechIcon_Shark2.gif"}  
+      if (10000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 13000) {
+        Text = ["Why don't you chase after the ducks and pigeons instead?"]; 
+        SpeechBox[1].src = "SpeechIcon_Chicken3.gif"                         }  
+      if (13000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 18000) {
+        Text = ["I've become bored of their taste,", 
+                "I want to try something unique for a change"]; 
+        SpeechBox[1].src = "SpeechIcon_Eagle5.gif"                           }
+      if (18000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 25000) {
+        Text = ["I knew that 'poor mother supporting her starving chicks' excuse",
+                "was a crock of shit! Word of advice:", 
+                "Next time, don't hunt just after a meal, fat-ass!"               ]; 
+        SpeechBox[1].src = "SpeechIcon_Shark2.gif"                           }
+      if (25000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 30000) {
+        Text = ["I swear to God, if you don't shut that wide trap of yours..."]; 
+        SpeechBox[1].src = "SpeechIcon_Eagle3.gif"                           }
+      if (30000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 40000) {
+        Text = ["Then you'll do what? Have a heart attack in mid-air?",
+                "Speaking of which, I wonder what eagle tastes like"   ]; 
+        SpeechBox[1].src = "SpeechIcon_Shark3.gif"                           }
+      if (40000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 45000) {
+        Text = ["I dare you to try, primitive fish!", "I'll peck and scratch your eyes out"]; 
+        SpeechBox[1].src = "SpeechIcon_Eagle3.gif"                           }
+      if (45000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 60000) {
+        Text = ["Are you conserving your energy for that?",
+                "is that why you can't keep up with us, Tubby Lumpkins?"]; 
+        SpeechBox[1].src = "SpeechIcon_Shark3.gif"                           }
+      if (60000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 80000) {
+        Text = ["Hey chicken, here's a joke...",
+                "What does slow-coach here have in common with a cargo",
+                "variant of the Boeing 747 and Airbus A380?"             ]; 
+        SpeechBox[1].src = "SpeechIcon_Shark4.gif"                           } 
+      if (80000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 90000) {
+        Text = ["She's flying with a heavy payload in her belly!",
+                "Can you hear us back there, fat-ass?"            ]; 
+        SpeechBox[1].src = "SpeechIcon_Shark5.gif"                           } 
+      if (90000 < Player.x - Map[2][0].x && Player.x - Map[2][0].x <= 100000) {
+        Text = ["Why don't you go extinct with the dinosaurs,",
+                "you cold grey bastard?"                       ]; 
+        SpeechBox[1].src = "SpeechIcon_Eagle4.gif"                            }
+      if (100000 < Player.x - Map[2][0].x && Player.jump) {
+        Text = ["Land at last! Go fuck yourselves, the pair of you!"]; 
+        SpeechBox[1].src = "SpeechIcon_Chicken2.gif"      } 
+      if (Map[2][1].x < Player.x && Player.jump == false && Player.x_v > 0) {
+        Text = ["Thank you for flying with Fryanair"]; 
+        SpeechBox[1].src = "SpeechIcon_Fryanair.gif"                        }  
+      if (SceneL4 == 1) {Text = ["My new pair of wings are already making me sick!"];
+                         SpeechBox[1].src = "SpeechIcon_Chicken4.gif"                }
+      if (SceneL4 == 2) {Text = ["Dear Lord, now what?"];
+                         SpeechBox[1].src = "SpeechIcon_Chicken5.gif"}     
+      if (SceneL4 == 3) {Text = ["Join the Fowl Liberation Army today!"];
+                         SpeechBox[1].src = "SpeechIcon_FLA_Spokesman1.gif"}
+      if (SceneL4 == 4) {Text = ["Yeah, about that, I'm not in the right physical or",
+                                 "mental state for military activism right now"];
+                         SpeechBox[1].src = "SpeechIcon_Chicken5.gif"            } 
+      if (SceneL4 == 5) {Text = ["We saw how gracefully you crossed the sky,",
+                                 "no one in our militia could glide like that"];
+                         SpeechBox[1].src = "SpeechIcon_FLA_Marksman1.gif"      } 
+      if (SceneL4 == 6) {Text = ["You'd make an excellent scout for espionage missions"]} 
+      if (SceneL4 == 7) {Text = ["Where did you get that kite from anyway?"];
+                         SpeechBox[1].src = "SpeechIcon_FLA_Spokesman1.gif"  }   
+      if (SceneL4 == 8) {Text = ["I stole it from my butcher farmer's son during my escape",
+                                 "from the farm"                                            ];
+                         SpeechBox[1].src = "SpeechIcon_Chicken6.gif"                         }
+      if (SceneL4 == 9) {Text = ["We also began our lives in captivity, now here we are,",
+                                 "freeing other poultry birds.",
+                                 "We intend to spread this liberation worldwide."         ];
+                         SpeechBox[1].src = "SpeechIcon_FLA_Spokesman1.gif"                 }
+      if (SceneL4 == 10) {Text = ["Just wondering, does this also apply to birds of prey?"];
+                          SpeechBox[1].src = "SpeechIcon_Chicken6.gif"                      }
+      if (SceneL4 == 11) {Text = ["No, they are our enemies!",
+                                  "Has that eagle circling above us been bothering you?"];
+                          SpeechBox[1].src = "SpeechIcon_FLA_Spokesman1.gif"              }   
+      if (SceneL4 == 12) {Text = ["Now that you mention it, it followed me all the way here!",
+                                  "I barely made it across with my life,",
+                                  "it probably only stopped because of your presence!"];
+                          SpeechBox[1].src = "SpeechIcon_Chicken9.gif"                  }
+      if (SceneL4 == 13) {Text = ["Watch this..."];
+                          SpeechBox[1].src = "SpeechIcon_FLA_Marksman2.gif"}
+      if (SceneL4 == 14) {Text = []}                    
+      if (SceneL4 == 17) {Text = ["Does lead taste \"unique\" enough for ya? HAH!"];
+                          SpeechBox[1].src = "SpeechIcon_Chicken7.gif"              }    
+      if (SceneL4 == 18) {Text = ["That's the warmongering attitude we like to see!",
+                                  "Now imagine how fulfilling it would be to enact some",
+                                  "similar retribution upon that accursed farmer of yours!"];
+                          SpeechBox[1].src = "SpeechIcon_FLA_Spokesman2.gif"                 }
+      if (SceneL4 == 19) {Text = ["Like I said, I feel like shit at the moment,",
+                                  "I'm amazed at how quickly the sand absorbed my vomit"];
+                          SpeechBox[1].src = "SpeechIcon_Chicken6.gif"                    } 
+      if (SceneL4 == 20) {Text = ["You can get plenty of rest at our camp,",
+                                  "hop onto our truck, our spiritual leader will be",
+                                  "delighted to see you as our newest recruit"       ];
+                          SpeechBox[1].src = "SpeechIcon_FLA_Spokesman2.gif"           }
+      if (SceneL4 == 21) {Text = ["(They're gonna harvest my organs and sell them on",
+                                  "the black market, aren't they?)"                   ];
+                          SpeechBox[1].src = "SpeechIcon_Chicken8.gif"                  }
+      if (SceneL4 == 22) {Text = ["(Stop being so paranoid, not everything's out",
+                                  "to get you! Being on the run has taken its toll",
+                                  "on my mental faculties, Jesus Christ!)"          ]} 
+      if (SceneL4 == 23) {Text = []}                            
+      if (SceneL4 == 24) {Text = ["Cockblock's the name,",
+                                  "spiritually-enlightening fowlkind to victory is my game!",
+                                  "How are you feeling at this moment?"                      ];
+                          SpeechBox[1].src = "SpeechIcon_Cockblock1.gif"}
+      if (SceneL4 == 25) {Text = ["I'm a lot better, thank you.",
+                                  "For a militia base, I'm amazed by the high quality of",
+                                  "your memory foam mattresses"                           ];
+                          SpeechBox[1].src = "SpeechIcon_Chicken10.gif"                     } 
+      if (SceneL4 == 26) {Text = ["It all lies in the priciple of marginal gains, my boy.",
+                                  "A well-rested brother is able to strike terror into the",
+                                  "enemies of fowl-kind more efficiently"                   ];
+                          SpeechBox[1].src = "SpeechIcon_Cockblock1.gif"                      }
+      if (SceneL4 == 27) {Text = ["To think that a new recruit would fly across the ocean",
+                                  "only to end up right on our doorstep...",
+                                  "Victory is inevitable now that God's on our side!"      ];
+                          SpeechBox[1].src = "SpeechIcon_Cockblock2.gif"                     }
+      if (SceneL4 == 28) {Text = ["One thing that piques my curiosity, how do you",
+                                  "raise the funds for your equipment and operations?"];
+                          SpeechBox[1].src = "SpeechIcon_Chicken11.gif"                 }  
+      if (SceneL4 == 29) {Text = ["Well you see, " + UserName + ",",
+                                  "This island has highly lucrative tax laws, attracting",
+                                  "loads of wealthy investors and money launderers here"  ];
+                          SpeechBox[1].src = "SpeechIcon_Cockblock1.gif"                    } 
+      if (SceneL4 == 30) {Text = ["Ironically, whilst hiding their wealth from their local",
+                                  "government, they flaunt it openly here, sporting",
+                                  "designer watches, handbags, jewellery, the list goes on" ]}
+      if (SceneL4 == 31) {Text = ["Then we enter the scene to divert the cashflow from their",
+                                  "hedonistic opulence towards our more noble cause:",
+                                  "Global Fowldom!"                                           ]} 
+      if (SceneL4 == 32) {Text = ["It is said that the crime rate on this island is high,",
+                                  "which I rebut by asserting that socialism is not a crime.",
+                                  "They call it \"theft\", we call it \"wealth redistribution\"!"]}
+      if (SceneL4 == 33) {Text = ["I admire your optimism and all, but don't you think",
+                                  "that you may be attempting to boil the ocean with such",
+                                  "Napoleon Bonaparte-tier ambitions?"                     ];
+                          SpeechBox[1].src = "SpeechIcon_Chicken12.gif"                      }
+      if (SceneL4 == 34) {Text = ["I suppose you have a point, my targets might be unattainable,",
+                                  "however the whole agenda lies in igniting fervour for",
+                                  "our political cause"                                           ];
+                          SpeechBox[1].src = "SpeechIcon_Cockblock1.gif"                            }
+      if (SceneL4 == 35) {Text = ["Complacency and mediocrity form the Achilles heel to",
+                                  "motivation. Aim for the stars, so you land on the moon",
+                                  "at least."                                              ]}
+      if (SceneL4 == 36) {Text = ["Our modus operandi have always served us well at the",
+                                  "negotiating table with our suppliers. You'll understand",
+                                  "once you become the head of a new cell at this militia"  ]}
+      if (SceneL4 == 37) {Text = ["We barely know each other, yet you already wish to",
+                                  "place me in such a position of command?"            ];
+                          SpeechBox[1].src = "SpeechIcon_Chicken12.gif"                  }
+      if (SceneL4 == 38) {Text = ["Now you listen here, " + UserName + ",",
+                                  "I see great leadership potential in you"];
+                          SpeechBox[1].src = "SpeechIcon_Cockblock3.gif"     }
+      if (SceneL4 == 39) {Text = ["I'm just a simple chicken attempting to survive",
+                                  "in a cold and cutthroat world"                   ];
+                          SpeechBox[1].src = "SpeechIcon_Chicken11.gif"               }    
+      if (SceneL4 == 40) {Text = ["And you're willing to cut throats in order to achieve",
+                                  "that objective, I can sense it!",
+                                  "That's what makes your spirit pure!"                   ];
+                          SpeechBox[1].src = "SpeechIcon_Cockblock3.gif"                    }  
+      if (SceneL4 == 41) {Text = ["No guarantees of material abundance necessary.",
+                                  "You simply do what you have to do to survive."  ]}     
+      if (SceneL4 == 42) {Text = ["Furthermore, you get a potent thrill out of the risk,",
+                                  "you thrive off of uncertainty. Against all odds,",
+                                  "you snatch victory from the jaws of defeat!"           ]} 
+      if (SceneL4 == 43) {Text = ["A bastion of hope in times of hardship,",
+                                  "you're EXACTLY what we need to steer our boat",
+                                  "through rough, choppy seas!"                   ]}  
+      if (SceneL4 == 44) {Text = ["It was never about the inevitable trip to the abbatoir.",
+                                  "Sure, you were one of the handful of the poultry birds on",
+                                  "your farm who could read the writing on the wall, however..."]}  
+      if (SceneL4 == 45) {Text = ["what really spurred your disdain for your farmer was",
+                                  "the monotonous, mediocre lifestyle of security he forced",
+                                  "upon you, that\'s why you hate him so much, isn\'t that so?"]}
+      if (SceneL4 == 46) {Text = ["Rather than die twice on the farm,",
+                                  "it's better to die once attempting to escape"];
+                          SpeechBox[1].src = "SpeechIcon_Chicken12.gif"           }    
+      if (SceneL4 == 47) {Text = ["My brethren are bucket crabs, they held me back for so long,",
+                                  "expecting me to join them in the cesspool of their",
+                                  "meaningless existence!"                                       ]}
+      if (SceneL4 == 48) {Text = ["I warned them that the gravy train wouldn't last forever,",
+                                  "yet they still couldn't give a shit. They would rather die",
+                                  "defending the farmer to prolongue their access to..."       ]}
+      if (SceneL4 == 49) {Text = ["pathetic creature comforts! Grain and shelter are all",
+                                  "their primitive minds ever cared about, fuck them all!",
+                                  "At least grinding on the outside gives me purpose!"     ]}
+      if (SceneL4 == 50) {Text = ["Do you really think that those degenerate reprobates",
+                                  "would be of any utility to your organisation?"        ]} 
+      if (SceneL4 == 51) {Text = ["But my boy, that's precisely the point!",
+                                  "Every socialist state needs its proletariats; the useful",
+                                  "idiots keeping the wheels of our utopia spinning"         ];
+                          SpeechBox[1].src = "SpeechIcon_Cockblock2.gif"                       } 
+      if (SceneL4 == 52) {Text = ["When we're the ones providing them with their precious",
+                                  "bread and circuses, guess who they'll defend to the death"]}
+      if (SceneL4 == 53) {Text = ["Us"]; SpeechBox[1].src = "SpeechIcon_Chicken10.gif"}       
+      if (SceneL4 == 54) {Text = ["That's right! Our political culture will be more in tune",
+                                  "with the Animal Farm style of socialism, with die-hard",
+                                  "fanatics of the FLA (you and I for example) at the top."  ];
+                          SpeechBox[1].src = "SpeechIcon_Cockblock1.gif"                       }
+      if (SceneL4 == 55) {Text = ["You in?"]}
+      if (SceneL4 == 56) {Text = ["Hell yeah!"]; SpeechBox[1].src = "SpeechIcon_Chicken13.gif"}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
                     };
+
     if (Level == 5) {if (Player.x <= 400) {Text = "--> In your own time... -->"};
       if (Player.x - Map[1][0].x > 500 && Player.x - Map[1][0].x < 1000) 
         {Text = 'Reflection: "How much I was missing out on in life..."'};
@@ -1214,45 +1596,82 @@
                      };     
                      
   // Animations                   
-  var DATE  
+  var Temp;
 
   var ReaperHead = new Image(); ReaperHead.src = "ReaperHead.gif";
 
-  function ImageFlip() {// When the character direction changes, so does the image used for it
+  function ImageFlip() {
     if (Level == 1) {
-      if (DATE.getMilliseconds() < 100) {Farmer.src = "Farmer1.gif"}
-      if (100<=DATE.getMilliseconds()&&DATE.getMilliseconds()<200) {Farmer.src = "Farmer2.gif"}
-      if (200<=DATE.getMilliseconds()&&DATE.getMilliseconds()<300) {Farmer.src = "Farmer3.gif"}
-      if (300<=DATE.getMilliseconds()&&DATE.getMilliseconds()<400) {Farmer.src = "Farmer4.gif"}
-      if (400<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {Farmer.src = "Farmer5.gif"}
-      if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<600) {Farmer.src = "Farmer6.gif"}
-      if (600<=DATE.getMilliseconds()&&DATE.getMilliseconds()<700) {Farmer.src = "Farmer7.gif"}
-      if (700<=DATE.getMilliseconds()&&DATE.getMilliseconds()<800) {Farmer.src = "Farmer8.gif"}
-      if (800<=DATE.getMilliseconds()&&DATE.getMilliseconds()<900) {Farmer.src = "Farmer9.gif"}
-      if (DATE.getMilliseconds()&&DATE.getMilliseconds() >= 900) {Farmer.src = "Farmer10.gif"}
+      if (Temp < 100) {Farmer.src = "Farmer1.gif"}
+      if (100 <= Temp && Temp < 200) {Farmer.src = "Farmer2.gif"}
+      if (200 <= Temp && Temp < 300) {Farmer.src = "Farmer3.gif"}
+      if (300 <= Temp && Temp < 400) {Farmer.src = "Farmer4.gif"}
+      if (400 <= Temp && Temp < 500) {Farmer.src = "Farmer5.gif"}
+      if (500 <= Temp && Temp < 600) {Farmer.src = "Farmer6.gif"}
+      if (600 <= Temp && Temp < 700) {Farmer.src = "Farmer7.gif"}
+      if (700 <= Temp && Temp < 800) {Farmer.src = "Farmer8.gif"}
+      if (800 <= Temp && Temp < 900) {Farmer.src = "Farmer9.gif"}
+      if (Temp >= 900) {Farmer.src = "Farmer10.gif"}
+
+      if (Player.Surprised) {FH.src = "FarmerHead5.gif"}
+      else {
+        if (Temp < 63) {FH.src = "FarmerHead1.gif"}
+        if (63 <= Temp && Temp < 125) {FH.src = "FarmerHead1.5.gif"}
+        if (125 <= Temp && Temp < 188) {FH.src = "FarmerHead2.gif"}
+        if (188 <= Temp && Temp < 250) {FH.src = "FarmerHead2.5.gif"}
+        if (250 <= Temp && Temp < 313) {FH.src = "FarmerHead3.gif"}
+        if (313 <= Temp && Temp < 375) {FH.src = "FarmerHead2.5.gif"}
+        if (375 <= Temp && Temp < 438) {FH.src = "FarmerHead2.gif"}
+        if (438 <= Temp && Temp < 500) {FH.src = "FarmerHead1.5.gif"}
+        if (500 <= Temp && Temp < 563) {FH.src = "FarmerHead1.gif"}
+        if (563 <= Temp && Temp < 625) {FH.src = "FarmerHead1.5.gif"}
+        if (625 <= Temp && Temp < 688) {FH.src = "FarmerHead2.gif"}
+        if (688 <= Temp && Temp < 750) {FH.src = "FarmerHead2.5.gif"}
+        if (750 <= Temp && Temp < 813) {FH.src = "FarmerHead3.gif"}
+        if (813 <= Temp && Temp < 875) {FH.src = "FarmerHead2.5.gif"}
+        if (875 <= Temp && Temp < 938) {FH.src = "FarmerHead2.gif"}
+        if (938 <= Temp) {FH.src = "FarmerHead1.5.gif"}
+           }
+      
                     };
 
-    if (Level != 7) {
+    if (Level != 4 && Level != 7) {
       if (Player.jump == false) {
       if (keys.right) {
-        if (DATE.getMilliseconds() < 125) {Chicken.src = "ChickenR1.gif"}
-        if (125<=DATE.getMilliseconds()&&DATE.getMilliseconds()<250) {Chicken.src="ChickenR2.gif"}
-        if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<375) {Chicken.src="ChickenR3.gif"}
-        if (375<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {Chicken.src="ChickenR2.gif"}
-        if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<625) {Chicken.src="ChickenR1.gif"}
-        if (625<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {Chicken.src="ChickenR2.gif"}
-        if (750<=DATE.getMilliseconds()&&DATE.getMilliseconds()<875) {Chicken.src="ChickenR3.gif"}
-        if (DATE.getMilliseconds() >= 875) {Chicken.src = "ChickenR2.gif"}
+        if (Temp < 63) {Chicken.src = "ChickenR1.gif"}
+        if (63 <= Temp && Temp < 125) {Chicken.src = "ChickenR1.5.gif"}
+        if (125 <= Temp && Temp < 188) {Chicken.src = "ChickenR2.gif"}
+        if (188 <= Temp && Temp < 250) {Chicken.src = "ChickenR2.5.gif"}
+        if (250 <= Temp && Temp < 313) {Chicken.src = "ChickenR3.gif"}
+        if (313 <= Temp && Temp < 375) {Chicken.src = "ChickenR2.5.gif"}
+        if (375 <= Temp && Temp < 438) {Chicken.src = "ChickenR2.gif"}
+        if (438 <= Temp && Temp < 500) {Chicken.src = "ChickenR1.5.gif"}
+        if (500 <= Temp && Temp < 563) {Chicken.src = "ChickenR1.gif"}
+        if (563 <= Temp && Temp < 625) {Chicken.src = "ChickenR1.5.gif"}
+        if (625 <= Temp && Temp < 688) {Chicken.src = "ChickenR2.gif"}
+        if (688 <= Temp && Temp < 750) {Chicken.src = "ChickenR2.5.gif"}
+        if (750 <= Temp && Temp < 813) {Chicken.src = "ChickenR3.gif"}
+        if (813 <= Temp && Temp < 875) {Chicken.src = "ChickenR2.5.gif"}
+        if (875 <= Temp && Temp < 938) {Chicken.src = "ChickenR2.gif"}
+        if (938 <= Temp) {Chicken.src = "ChickenR1.5.gif"}
                       }
       if (keys.left) {
-        if (DATE.getMilliseconds() < 125) {Chicken.src = "ChickenL1.gif"}
-        if (125<=DATE.getMilliseconds()&&DATE.getMilliseconds()<250) {Chicken.src="ChickenL2.gif"}
-        if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<375) {Chicken.src="ChickenL3.gif"}
-        if (375<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {Chicken.src="ChickenL2.gif"}
-        if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<625) {Chicken.src="ChickenL1.gif"}
-        if (625<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {Chicken.src="ChickenL2.gif"}
-        if (750<=DATE.getMilliseconds()&&DATE.getMilliseconds()<875) {Chicken.src="ChickenL3.gif"}
-        if (DATE.getMilliseconds() >= 875) {Chicken.src = "ChickenL2.gif"}
+        if (Temp < 63) {Chicken.src = "ChickenL1.gif"}
+        if (63 <= Temp && Temp < 125) {Chicken.src = "ChickenL1.5.gif"}
+        if (125 <= Temp && Temp < 188) {Chicken.src = "ChickenL2.gif"}
+        if (188 <= Temp && Temp < 250) {Chicken.src = "ChickenL2.5.gif"}
+        if (250 <= Temp && Temp < 313) {Chicken.src = "ChickenL3.gif"}
+        if (313 <= Temp && Temp < 375) {Chicken.src = "ChickenL2.5.gif"}
+        if (375 <= Temp && Temp < 438) {Chicken.src = "ChickenL2.gif"}
+        if (438 <= Temp && Temp < 500) {Chicken.src = "ChickenL1.5.gif"}
+        if (500 <= Temp && Temp < 563) {Chicken.src = "ChickenL1.gif"}
+        if (563 <= Temp && Temp < 625) {Chicken.src = "ChickenL1.5.gif"}
+        if (625 <= Temp && Temp < 688) {Chicken.src = "ChickenL2.gif"}
+        if (688 <= Temp && Temp < 750) {Chicken.src = "ChickenL2.5.gif"}
+        if (750 <= Temp && Temp < 813) {Chicken.src = "ChickenL3.gif"}
+        if (813 <= Temp && Temp < 875) {Chicken.src = "ChickenL2.5.gif"}
+        if (875 <= Temp && Temp < 938) {Chicken.src = "ChickenL2.gif"}
+        if (938 <= Temp) {Chicken.src = "ChickenL1.5.gif"}
                      }
                               }
       else {// Default image based on existing image
@@ -1267,29 +1686,100 @@
         if (keys.left) 
           {if (Player.y_v > 0) {Chicken.src = "ChickenJL.gif"} else {Chicken.src = "ChickenFL.gif"}}
            }
+                                  }
+
+    if (Level == 4) {if (Player.jump) {Chicken.src = "ChickenGlide.gif"}
+      else {if (Player.x < Map[1][0].x && Player.x_v > 0) {
+              if (Temp < 125) {Chicken.src = "ChickenGlideR1.gif"}
+              if (125 <= Temp && Temp < 250) 
+              {Chicken.src = "ChickenGlideR2.gif"}
+              if (250 <= Temp && Temp < 375) 
+              {Chicken.src = "ChickenGlideR3.gif"}
+              if (375 <= Temp && Temp < 500) 
+              {Chicken.src = "ChickenGlideR2.gif"}
+              if (500 <= Temp && Temp < 625) 
+              {Chicken.src = "ChickenGlideR1.gif"}
+              if (625 <= Temp && Temp < 750) 
+              {Chicken.src = "ChickenGlideR2.gif"}
+              if (750 <= Temp && Temp < 875) 
+              {Chicken.src = "ChickenGlideR3.gif"}
+              if (Temp >= 875) {Chicken.src = "ChickenGlideR2.gif"}
+                                                          }
+            if (Player.x > Map[2][1].x) {
+              if (Player.x_v >= 65) {if (Number(String(Temp)[0]) % 2 != 0) 
+                    {Chicken.src = "ChickenGlideBr3.gif"} else {Chicken.src = "ChickenGlideBr4.gif"}}
+              if (20 <= Player.x_v && Player.x_v < 65) {
+                if (Number(String(Temp)[0]) % 2 != 0) 
+                {Chicken.src = "ChickenGlideBr1.gif"} else {Chicken.src = "ChickenGlideBr2.gif"}
+                                                       }
+              if (0.1 <= Player.x_v && Player.x_v < 20) {Chicken.src = "ChickenGlideBr5.gif"}
+              if (Player.x_v < 0.1) {Chicken.src = "ChickenGlideV0.gif"}
+              if (Player.x_v == 0) {CutsceneL4();
+                if (SceneL4 == 1) {if (Number(String(Temp)[0]) % 2 != 0) 
+                  {Chicken.src = "ChickenGlideV1.gif"} else {Chicken.src = "ChickenGlideV2.gif"};
+                  if (Player.x > Map[7][127].x - 300) {Chicken.src = "ChickenGlideV3.gif"}
+                                  }
+                if (SceneL4 == 2) {Chicken.src = "ChickenGlideV3.gif"}
+                if (2 < SceneL4 && SceneL4 < 8) {Chicken.src = "ChickenGlideV4.gif"}
+                if ((8 <= SceneL4 && SceneL4 <= 16) || SceneL4 >= 19) 
+                {Chicken.src = "ChickenRear.gif"; if (Gx < 1030) {Gx++}}
+                if (SceneL4 == 17 || SceneL4 == 18) {Chicken.src = "ChickenMF.gif"}
+                                   }
+              if (SceneL4 == 3 || SceneL4 == 7 || SceneL4 == 9 || SceneL4 == 11 || SceneL4 == 18 ||
+                  SceneL4 == 20) 
+              {if (Number(String(Temp)[0]) % 2 != 0) 
+                  {AppImage[127].src = "TruckFLA2.gif"} else {AppImage[127].src = "TruckFLA3.gif"}}
+              if (SceneL4 == 5 || SceneL4 == 6 || SceneL4 == 13) 
+              {if (Number(String(Temp)[0]) % 2 != 0) 
+                  {AppImage[127].src = "TruckFLA2.gif"} else {AppImage[127].src = "TruckFLA4.gif"}}
+              if (SceneL4 == 14) {AppImage[127].src = "TruckFLA5.gif"}  
+              if (SceneL4 == 15) {if (Number(String(Temp)[0]) % 2 != 0) 
+                  {AppImage[127].src = "TruckFLA5.gif"} else {AppImage[127].src = "TruckFLA6.gif"}
+                                 }  
+              if (SceneL4 == 16) {AppImage[127].src = "TruckFLA5.gif"; Farmer.src = "Eagle2.gif"}  
+              if (SceneL4 == 17 || SceneL4 == 19) {AppImage[127].src = "TruckFLA2.gif"}
+                                        }
+           };
+      if (Map[2][0].x + Map[2][0].width < Player.x && Player.x < Map[2][1].x && 
+      Player.y > Map[1][0].y - 110)              { 
+        if (Number(String(Temp)[0]) % 2 != 0) {Chicken.src = "ChickenGlideS1.gif"}
+        else {Chicken.src = "ChickenGlideS2.gif"}};
+
+      if (Player.x < Map[1][0].x) {AppImage[0].src = "SharkL.gif"}
+      if (Map[2][1].x < Player.x) {AppImage[0].src = "SharkR.gif"}
+      if (Map[2][0].x + Map[2][0].width < Player.x && Player.x < Map[2][1].x) {
+        if (Map[7][0].mode == 2 || Map[7][0].mode == 3) {AppImage[0].src = "Shark3.gif"}
+        else {if (Number(String(Temp)[0]) % 2 != 0) {AppImage[0].src = "Shark1.gif"}
+              else {AppImage[0].src = "Shark2.gif"}
+             }                                                                } 
+
+      if (Icon[0].src.includes("Click")) {
+        if (Number(String(Temp)[0]) % 2 != 0) {Icon[0].src = "Icon_Click1.gif"}
+        else {Icon[0].src = "Icon_Click2.gif"}
+                                         }     
                     }
 
-    else {
+    if (Level == 7) {
       if (Player.jump == false) {
       if (keys.right) {
-        if (DATE.getMilliseconds() < 125) {Chicken.src = "OldChickenR1.gif"}
-        if (125<=DATE.getMilliseconds()&&DATE.getMilliseconds()<250) {Chicken.src="OldChickenR2.gif"}
-        if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<375) {Chicken.src="OldChickenR3.gif"}
-        if (375<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {Chicken.src="OldChickenR2.gif"}
-        if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<625) {Chicken.src="OldChickenR1.gif"}
-        if (625<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {Chicken.src="OldChickenR2.gif"}
-        if (750<=DATE.getMilliseconds()&&DATE.getMilliseconds()<875) {Chicken.src="OldChickenR3.gif"}
-        if (DATE.getMilliseconds() >= 875) {Chicken.src = "OldChickenR2.gif"}
+        if (Temp < 125) {Chicken.src = "OldChickenR1.gif"}
+        if (125 <= Temp && Temp < 250) {Chicken.src="OldChickenR2.gif"}
+        if (250 <= Temp && Temp < 375) {Chicken.src="OldChickenR3.gif"}
+        if (375 <= Temp && Temp < 500) {Chicken.src="OldChickenR2.gif"}
+        if (500 <= Temp && Temp < 625) {Chicken.src="OldChickenR1.gif"}
+        if (625 <= Temp && Temp < 750) {Chicken.src="OldChickenR2.gif"}
+        if (750 <= Temp && Temp < 875) {Chicken.src="OldChickenR3.gif"}
+        if (Temp >= 875) {Chicken.src = "OldChickenR2.gif"}
                       }
       if (keys.left) {
-        if (DATE.getMilliseconds() < 125) {Chicken.src = "OldChickenL1.gif"}
-        if (125<=DATE.getMilliseconds()&&DATE.getMilliseconds()<250) {Chicken.src="OldChickenL2.gif"}
-        if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<375) {Chicken.src="OldChickenL3.gif"}
-        if (375<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {Chicken.src="OldChickenL2.gif"}
-        if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<625) {Chicken.src="OldChickenL1.gif"}
-        if (625<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {Chicken.src="OldChickenL2.gif"}
-        if (750<=DATE.getMilliseconds()&&DATE.getMilliseconds()<875) {Chicken.src="OldChickenL3.gif"}
-        if (DATE.getMilliseconds() >= 875) {Chicken.src = "OldChickenL2.gif"}
+        if (Temp < 125) {Chicken.src = "OldChickenL1.gif"}
+        if (125 <= Temp && Temp < 250) {Chicken.src="OldChickenL2.gif"}
+        if (250 <= Temp && Temp < 375) {Chicken.src="OldChickenL3.gif"}
+        if (375 <= Temp && Temp < 500) {Chicken.src="OldChickenL2.gif"}
+        if (500 <= Temp && Temp < 625) {Chicken.src="OldChickenL1.gif"}
+        if (625 <= Temp && Temp < 750) {Chicken.src="OldChickenL2.gif"}
+        if (750 <= Temp && Temp < 875) {Chicken.src="OldChickenL3.gif"}
+        if (Temp >= 875) {Chicken.src = "OldChickenL2.gif"}
                      }
                               }
       else {// Default image based on existing image
@@ -1324,82 +1814,83 @@
       Ghost.x = Player.x; 
       if ((Chicken.src.includes("D5") || Chicken.src.includes("D6")) && Ghost.y > - 110) 
         {Ghost.y -= 500/(Ghost.y + 100)} else {if (Ghost.y > - 110) {Ghost.y = Player.y}}
-         };                
+                    };                
 
-    if (Level == 1 || Level == 4) 
-    {for (let d = 0; d < Map[5].length; d++) {
-      if (Map[5][d].x_v > 0) {
-        if (DATE.getMilliseconds() < 250) {DuckImage[d].src = "DuckR1.gif"}
-        if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {DuckImage[d].src="DuckR2.gif"}
-        if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {DuckImage[d].src="DuckR3.gif"}
-        if (DATE.getMilliseconds() >= 750) {DuckImage[d].src = "DuckR2.gif"}
+    if (Level == 1) {for (let d = 0; d < 3; d++) {
+        if (Map[5][d].x_v > 0) {
+          if (Temp < 250) {DuckImage[d].src = "DuckR1.gif"}
+          if (250<=Temp&&Temp<500) {DuckImage[d].src="DuckR2.gif"}
+          if (500<=Temp&&Temp<750) {DuckImage[d].src="DuckR3.gif"}
+          if (Temp >= 750) {DuckImage[d].src = "DuckR2.gif"}
                              };
-      if (Map[5][d].x_v < 0) {
-        if (DATE.getMilliseconds() < 250) {DuckImage[d].src = "DuckL1.gif"}
-        if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {DuckImage[d].src="DuckL2.gif"}
-        if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {DuckImage[d].src="DuckL3.gif"}
-        if (DATE.getMilliseconds() >= 750) {DuckImage[d].src = "DuckL2.gif"}
-                             }
-                                             };
-     for (let p = 0; p < Map[6].length; p++) {
-      if (DATE.getMilliseconds() < 125) {PigeonImage[p].src = "Pigeon1.gif"}
-      if (125<=DATE.getMilliseconds()&&DATE.getMilliseconds()<250) {PigeonImage[p].src="Pigeon2.gif"}
-      if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<375) {PigeonImage[p].src="Pigeon3.gif"}
-      if (375<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {PigeonImage[p].src="Pigeon4.gif"}
-      if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<625) {PigeonImage[p].src="Pigeon5.gif"}
-      if (625<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {PigeonImage[p].src="Pigeon4.gif"}
-      if (750<=DATE.getMilliseconds()&&DATE.getMilliseconds()<875) {PigeonImage[p].src="Pigeon3.gif"}
-      if (DATE.getMilliseconds() >= 875) {PigeonImage[p].src = "Pigeon2.gif"}
-                                             }                                       
-    };
-    if (Level == 2) {for (let d = 0; d < Map[5].length; d++) {
+        if (Map[5][d].x_v < 0) {
+          if (Temp < 250) {DuckImage[d].src = "DuckL1.gif"}
+          if (250<=Temp&&Temp<500) {DuckImage[d].src="DuckL2.gif"}
+          if (500<=Temp&&Temp<750) {DuckImage[d].src="DuckL3.gif"}
+          if (Temp >= 750) {DuckImage[d].src = "DuckL2.gif"}
+                               }                 }
+                    };
+    if (Level == 1 || Level == 4) {let P = Map[6].length;                
+      for (let p = 0; p < P; p++) {
+        if (Temp < 125) {PigeonImage[p].src = "Pigeon1.gif"}
+        if (125<=Temp&&Temp<250){PigeonImage[p].src="Pigeon2.gif"}
+        if (250<=Temp&&Temp<375){PigeonImage[p].src="Pigeon3.gif"}
+        if (375<=Temp&&Temp<500){PigeonImage[p].src="Pigeon4.gif"}
+        if (500<=Temp&&Temp<625){PigeonImage[p].src="Pigeon5.gif"}
+        if (625<=Temp&&Temp<750){PigeonImage[p].src="Pigeon4.gif"}
+        if (750<=Temp&&Temp<875){PigeonImage[p].src="Pigeon3.gif"}
+        if (Temp >= 875) {PigeonImage[p].src = "Pigeon2.gif"}
+                                  }   
+                                  };                                    
+    
+    if (Level == 2) {for (let d = 0; d < 2; d++) {
         if (Map[5][d].width < 30 && Map[5][d].x_v > 0) {DuckImage[d].src = "RatR.gif"};
         if (Map[5][d].width < 30 && Map[5][d].x_v < 0) {DuckImage[d].src = "RatL.gif"};
         if (Map[5][d].width > 30 && Map[5][d].x_v > 0) {DuckImage[d].src = "FishR.gif"};
         if (Map[5][d].width > 30 && Map[5][d].x_v < 0) {DuckImage[d].src = "FishL.gif"}
-                                                             };
-      for (let p = 0; p < Map[6].length; p++) {
-        if (DATE.getMilliseconds() < 125) {PigeonImage[p].src = "Bat1.gif"}
-        if (125<=DATE.getMilliseconds()&&DATE.getMilliseconds()<250) {PigeonImage[p].src="Bat2.gif"}
-        if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<375) {PigeonImage[p].src="Bat1.gif"}
-        if (375<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {PigeonImage[p].src="Bat2.gif"}
-        if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<625) {PigeonImage[p].src="Bat1.gif"}
-        if (625<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {PigeonImage[p].src="Bat2.gif"}
-        if (750<=DATE.getMilliseconds()&&DATE.getMilliseconds()<875) {PigeonImage[p].src="Bat1.gif"}
-        if (DATE.getMilliseconds() >= 875) {PigeonImage[p].src = "Bat2.gif"}
-                                              }
+                                                 };
+      for (let p = 0; p < 2; p++) {
+        if (Temp < 125) {PigeonImage[p].src = "Bat1.gif"}
+        if (125<=Temp&&Temp<250) {PigeonImage[p].src="Bat2.gif"}
+        if (250<=Temp&&Temp<375) {PigeonImage[p].src="Bat1.gif"}
+        if (375<=Temp&&Temp<500) {PigeonImage[p].src="Bat2.gif"}
+        if (500<=Temp&&Temp<625) {PigeonImage[p].src="Bat1.gif"}
+        if (625<=Temp&&Temp<750) {PigeonImage[p].src="Bat2.gif"}
+        if (750<=Temp&&Temp<875) {PigeonImage[p].src="Bat1.gif"}
+        if (Temp >= 875) {PigeonImage[p].src = "Bat2.gif"}
+                                  }
                     };
     if (Level == 3) {Farmer.src = "Crosshairs.gif"}
-    if (Level == 4) {Farmer.src = "Eagle.gif"}
+    if (Level == 4 && Player.Active) {Farmer.src = "Eagle1.gif"}
     if (Level == 6) {Farmer.src = "Matrix.gif"} 
 
     if (Level == 7) {
       if (Number.isInteger((Number(Minute[Minute.length-1]) + 2) / 2)) {
-        if (DATE.getMilliseconds() < 100) {Farmer.src = "Reaper1.gif"}
-        if (100 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 200) {Farmer.src="Reaper2.gif"}
-        if (200 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 300) {Farmer.src="Reaper3.gif"}
-        if (300 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 400) {Farmer.src="Reaper4.gif"}
-        if (400 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 500) {Farmer.src="Reaper5.gif"}
-        if (500 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 600) {Farmer.src="Reaper6.gif"}
-        if (600 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 700) {Farmer.src="Reaper7.gif"}
-        if (700 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 800) {Farmer.src="Reaper8.gif"}
-        if (800 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 900) {Farmer.src="Reaper9.gif"}
-        if (900 <= DATE.getMilliseconds()) {Farmer.src = "Reaper10.gif"}
+        if (Temp < 100) {Farmer.src = "Reaper1.gif"}
+        if (100 <= Temp && Temp < 200) {Farmer.src="Reaper2.gif"}
+        if (200 <= Temp && Temp < 300) {Farmer.src="Reaper3.gif"}
+        if (300 <= Temp && Temp < 400) {Farmer.src="Reaper4.gif"}
+        if (400 <= Temp && Temp < 500) {Farmer.src="Reaper5.gif"}
+        if (500 <= Temp && Temp < 600) {Farmer.src="Reaper6.gif"}
+        if (600 <= Temp && Temp < 700) {Farmer.src="Reaper7.gif"}
+        if (700 <= Temp && Temp < 800) {Farmer.src="Reaper8.gif"}
+        if (800 <= Temp && Temp < 900) {Farmer.src="Reaper9.gif"}
+        if (900 <= Temp) {Farmer.src = "Reaper10.gif"}
                                                                        }
       else {
-        if (DATE.getMilliseconds() < 100) {Farmer.src = "Reaper10.gif"}
-        if (100 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 200) {Farmer.src="Reaper9.gif"}
-        if (200 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 300) {Farmer.src="Reaper8.gif"}
-        if (300 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 400) {Farmer.src="Reaper7.gif"}
-        if (400 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 500) {Farmer.src="Reaper6.gif"}
-        if (500 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 600) {Farmer.src="Reaper5.gif"}
-        if (600 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 700) {Farmer.src="Reaper4.gif"}
-        if (700 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 800) {Farmer.src="Reaper3.gif"}
-        if (800 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 900) {Farmer.src="Reaper2.gif"}
-        if (900 <= DATE.getMilliseconds()) {Farmer.src = "Reaper1.gif"}
+        if (Temp < 100) {Farmer.src = "Reaper10.gif"}
+        if (100 <= Temp && Temp < 200) {Farmer.src="Reaper9.gif"}
+        if (200 <= Temp && Temp < 300) {Farmer.src="Reaper8.gif"}
+        if (300 <= Temp && Temp < 400) {Farmer.src="Reaper7.gif"}
+        if (400 <= Temp && Temp < 500) {Farmer.src="Reaper6.gif"}
+        if (500 <= Temp && Temp < 600) {Farmer.src="Reaper5.gif"}
+        if (600 <= Temp && Temp < 700) {Farmer.src="Reaper4.gif"}
+        if (700 <= Temp && Temp < 800) {Farmer.src="Reaper3.gif"}
+        if (800 <= Temp && Temp < 900) {Farmer.src="Reaper2.gif"}
+        if (900 <= Temp) {Farmer.src = "Reaper1.gif"}
            };
 
-      if (DATE.getMilliseconds() < 875) {AppImage[2].src = "Lamppost1.gif";
+      if (Temp < 875) {AppImage[2].src = "Lamppost1.gif";
         AppImage[4].src = "Lamppost1.gif"; AppImage[5].src = "Lamppost1.gif";
         AppImage[8].src = "Lamppost1.gif"; AppImage[9].src = "Lamppost1.gif";
         AppImage[10].src = "Lamppost1.gif"
@@ -1408,21 +1899,21 @@
         AppImage[8].src = "Lamppost2.gif"; AppImage[9].src = "Lamppost2.gif";
         AppImage[10].src = "Lamppost2.gif"     };
 
-      if (DATE.getMilliseconds() < 250) {AppImage[3].src = "Bar1.jpg"}
-      if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {AppImage[3].src = "Bar2.jpg"}
-      if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {AppImage[3].src = "Bar3.jpg"}
-      if (DATE.getMilliseconds() >= 750) {AppImage[3].src = "Bar4.jpg"};
+      if (Temp < 250) {AppImage[3].src = "Bar1.jpg"}
+      if (250<=Temp&&Temp<500) {AppImage[3].src = "Bar2.jpg"}
+      if (500<=Temp&&Temp<750) {AppImage[3].src = "Bar3.jpg"}
+      if (Temp >= 750) {AppImage[3].src = "Bar4.jpg"};
 
-      if (DATE.getMilliseconds() < 100) {AppImage[11].src = "Salon1.jpg"}
-      if (100<=DATE.getMilliseconds()&&DATE.getMilliseconds()<200) {AppImage[11].src = "Salon2.jpg"}
-      if (200<=DATE.getMilliseconds()&&DATE.getMilliseconds()<300) {AppImage[11].src = "Salon3.jpg"}
-      if (300<=DATE.getMilliseconds()&&DATE.getMilliseconds()<400) {AppImage[11].src = "Salon4.jpg"}
-      if (400<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {AppImage[11].src = "Salon5.jpg"}
-      if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<600) {AppImage[11].src = "Salon6.jpg"}
-      if (600<=DATE.getMilliseconds()&&DATE.getMilliseconds()<700) {AppImage[11].src = "Salon7.jpg"}
-      if (700<=DATE.getMilliseconds()&&DATE.getMilliseconds()<800) {AppImage[11].src = "Salon8.jpg"}
-      if (800<=DATE.getMilliseconds()&&DATE.getMilliseconds()<900) {AppImage[11].src = "Salon7.jpg"}
-      if (DATE.getMilliseconds() >= 900) {AppImage[11].src = "Salon8.jpg"};
+      if (Temp < 100) {AppImage[11].src = "Salon1.jpg"}
+      if (100<=Temp&&Temp<200) {AppImage[11].src = "Salon2.jpg"}
+      if (200<=Temp&&Temp<300) {AppImage[11].src = "Salon3.jpg"}
+      if (300<=Temp&&Temp<400) {AppImage[11].src = "Salon4.jpg"}
+      if (400<=Temp&&Temp<500) {AppImage[11].src = "Salon5.jpg"}
+      if (500<=Temp&&Temp<600) {AppImage[11].src = "Salon6.jpg"}
+      if (600<=Temp&&Temp<700) {AppImage[11].src = "Salon7.jpg"}
+      if (700<=Temp&&Temp<800) {AppImage[11].src = "Salon8.jpg"}
+      if (800<=Temp&&Temp<900) {AppImage[11].src = "Salon7.jpg"}
+      if (Temp >= 900) {AppImage[11].src = "Salon8.jpg"};
                     }                                  
                        };
 
@@ -1456,84 +1947,100 @@
 
   var FH = new Image(); FH.src = "FarmerHead1.gif";
 
-  var Chicken_x = 800; var Dash = false
+  var Chicken_x = 800; var Dash = false;
 
-  var Minute;
+  var Minute; var MINUTE; var Phase;
 
-  function Scene() {// Cover pages are displayed
+  function Scene() {
     if (Game == "Off") {Screen.src = "BackgroundL1-0.jpg";
 
-      if (DATE.getMilliseconds() < 100) {Farmer.src = "Farmer1.gif"}
-      if (100<=DATE.getMilliseconds()&&DATE.getMilliseconds()<200) {Farmer.src = "Farmer2.gif"}
-      if (200<=DATE.getMilliseconds()&&DATE.getMilliseconds()<300) {Farmer.src = "Farmer3.gif"}
-      if (300<=DATE.getMilliseconds()&&DATE.getMilliseconds()<400) {Farmer.src = "Farmer4.gif"}
-      if (400<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {Farmer.src = "Farmer5.gif"}
-      if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<600) {Farmer.src = "Farmer6.gif"}
-      if (600<=DATE.getMilliseconds()&&DATE.getMilliseconds()<700) {Farmer.src = "Farmer7.gif"}
-      if (700<=DATE.getMilliseconds()&&DATE.getMilliseconds()<800) {Farmer.src = "Farmer8.gif"}
-      if (800<=DATE.getMilliseconds()&&DATE.getMilliseconds()<900) {Farmer.src = "Farmer9.gif"}
-      if (DATE.getMilliseconds() >= 900) {Farmer.src = "Farmer10.gif"};
+      if (Temp < 100) {Farmer.src = "Farmer1.gif"}
+      if (100<=Temp&&Temp<200) {Farmer.src = "Farmer2.gif"}
+      if (200<=Temp&&Temp<300) {Farmer.src = "Farmer3.gif"}
+      if (300<=Temp&&Temp<400) {Farmer.src = "Farmer4.gif"}
+      if (400<=Temp&&Temp<500) {Farmer.src = "Farmer5.gif"}
+      if (500<=Temp&&Temp<600) {Farmer.src = "Farmer6.gif"}
+      if (600<=Temp&&Temp<700) {Farmer.src = "Farmer7.gif"}
+      if (700<=Temp&&Temp<800) {Farmer.src = "Farmer8.gif"}
+      if (800<=Temp&&Temp<900) {Farmer.src = "Farmer9.gif"}
+      if (Temp >= 900) {Farmer.src = "Farmer10.gif"};
 
-      if (400 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 500) {Truck.src = "Truck1.gif"}
-      if (DATE.getMilliseconds() >= 900) {Truck.src = "Truck1.gif"}
+      if (400 <= Temp && Temp < 500) {Truck.src = "Truck1.gif"}
+      if (Temp >= 900) {Truck.src = "Truck1.gif"}
       else {Truck.src = "Truck2.gif"};
       if (Truck_x < 2000) {Truck_x += 5} else {Truck_x -= 5000};
 
       if (Dash) {FH.src = "FarmerHead4.gif";
-        if (DATE.getMilliseconds() < 63) {Chicken.src = "ChickenS1.gif"}
-        if (63<=DATE.getMilliseconds()&&DATE.getMilliseconds()<125) {Chicken.src="ChickenS2.gif"}
-        if (125<=DATE.getMilliseconds()&&DATE.getMilliseconds()<188) {Chicken.src="ChickenS3.gif"}
-        if (188<=DATE.getMilliseconds()&&DATE.getMilliseconds()<250) {Chicken.src="ChickenS2.gif"}
-        if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<313) {Chicken.src="ChickenS1.gif"}
-        if (313<=DATE.getMilliseconds()&&DATE.getMilliseconds()<375) {Chicken.src="ChickenS2.gif"}
-        if (375<=DATE.getMilliseconds()&&DATE.getMilliseconds()<438) {Chicken.src="ChickenS3.gif"}
-        if (438<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {Chicken.src="ChickenS2.gif"}
-        if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<563) {Chicken.src="ChickenS1.gif"}
-        if (563<=DATE.getMilliseconds()&&DATE.getMilliseconds()<625) {Chicken.src="ChickenS2.gif"}
-        if (625<=DATE.getMilliseconds()&&DATE.getMilliseconds()<688) {Chicken.src="ChickenS3.gif"}
-        if (688<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {Chicken.src="ChickenS2.gif"}
-        if (750<=DATE.getMilliseconds()&&DATE.getMilliseconds()<813) {Chicken.src="ChickenS1.gif"}
-        if (813<=DATE.getMilliseconds()&&DATE.getMilliseconds()<875) {Chicken.src="ChickenS2.gif"}
-        if (875<=DATE.getMilliseconds()&&DATE.getMilliseconds()<938) {Chicken.src="ChickenS3.gif"}
-        if (938 <= DATE.getMilliseconds()) {Chicken.src = "ChickenS2.gif"}
+        if (Temp < 1000/32) {Chicken.src = "ChickenS1.gif"}
+        if (1000/32<=Temp&&Temp<2000/32) {Chicken.src="ChickenS1.5.gif"}
+        if (2000/32<=Temp&&Temp<3000/32) {Chicken.src="ChickenS2.gif"}
+        if (3000/32<=Temp&&Temp<4000/32) {Chicken.src="ChickenS2.5.gif"}
+        if (4000/32<=Temp&&Temp<5000/32) {Chicken.src="ChickenS3.gif"}
+        if (5000/32<=Temp&&Temp<6000/32) {Chicken.src="ChickenS2.5.gif"}
+        if (6000/32<=Temp&&Temp<7000/32) {Chicken.src="ChickenS2.gif"}
+        if (7000/32<=Temp&&Temp<8000/32) {Chicken.src="ChickenS1.5.gif"}
+        if (8000/32<=Temp&&Temp<9000/32) {Chicken.src="ChickenS1.gif"}
+        if (9000/32<=Temp&&Temp<10000/32) {Chicken.src="ChickenS1.5.gif"}
+        if (10000/32<=Temp&&Temp<11000/32) {Chicken.src="ChickenS2.gif"}
+        if (11000/32<=Temp&&Temp<12000/32) {Chicken.src="ChickenS2.5.gif"}
+        if (12000/32<=Temp&&Temp<13000/32) {Chicken.src="ChickenS3.gif"}
+        if (13000/32<=Temp&&Temp<14000/32) {Chicken.src="ChickenS2.5.gif"}
+        if (14000/32<=Temp&&Temp<15000/32) {Chicken.src="ChickenS2.gif"}
+        if (15000/16<=Temp&&Temp<16000/16) {Chicken.src="ChickenS1.5.gif"}
+        if (16000/16<=Temp&&Temp<17000/16) {Chicken.src="ChickenS1.gif"}
+        if (17000/32<=Temp&&Temp<18000/32) {Chicken.src="ChickenS1.5.gif"}
+        if (18000/32<=Temp&&Temp<19000/32) {Chicken.src="ChickenS2.gif"}
+        if (19000/32<=Temp&&Temp<20000/32) {Chicken.src="ChickenS2.5.gif"}
+        if (20000/32<=Temp&&Temp<21000/32) {Chicken.src="ChickenS3.gif"}
+        if (21000/32<=Temp&&Temp<22000/32) {Chicken.src="ChickenS2.5.gif"}
+        if (22000/32<=Temp&&Temp<23000/32) {Chicken.src="ChickenS2.gif"}
+        if (23000/32<=Temp&&Temp<24000/32) {Chicken.src="ChickenS1.5.gif"}
+        if (24000/32<=Temp&&Temp<25000/32) {Chicken.src="ChickenS1.gif"}
+        if (25000/32<=Temp&&Temp<26000/32) {Chicken.src="ChickenS1.5.gif"}
+        if (26000/32<=Temp&&Temp<27000/32) {Chicken.src="ChickenS2.gif"}
+        if (27000/32<=Temp&&Temp<28000/32) {Chicken.src="ChickenS2.5.gif"}
+        if (28000/32<=Temp&&Temp<29000/32) {Chicken.src="ChickenS3.gif"}
+        if (29000/32<=Temp&&Temp<30000/32) {Chicken.src="ChickenS2.5.gif"}
+        if (30000/32<=Temp&&Temp<31000/32) {Chicken.src="ChickenS2.gif"}
+        if (31000/32 <= Temp) {Chicken.src="ChickenS1.5.gif"}
                 }
       else {
-        if (DATE.getMilliseconds() < 125) 
-          {Chicken.src = "ChickenR1.gif"; FH.src = "FarmerHead1.gif"}
-        if (125 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 250) 
-          {Chicken.src = "ChickenR2.gif"; FH.src = "FarmerHead2.gif"}
-        if (250 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 375) 
-          {Chicken.src = "ChickenR3.gif"; FH.src = "FarmerHead3.gif"}
-        if (375 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 500) 
-          {Chicken.src = "ChickenR2.gif"; FH.src = "FarmerHead2.gif"}
-        if (500 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 625) 
-          {Chicken.src = "ChickenR1.gif"; FH.src = "FarmerHead1.gif"}
-        if (625 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 750) 
-          {Chicken.src = "ChickenR2.gif"; FH.src = "FarmerHead2.gif"}
-        if (750 <= DATE.getMilliseconds() && DATE.getMilliseconds() < 875) 
-          {Chicken.src = "ChickenR3.gif"; FH.src = "FarmerHead3.gif"}
-        if (DATE.getMilliseconds() >= 875) 
-          {Chicken.src = "ChickenR2.gif"; FH.src = "FarmerHead2.gif"}
+        if (Temp < 63) {Chicken.src = "ChickenR1.gif"; FH.src = "FarmerHead1.gif"}
+        if (63 <= Temp && Temp < 125) {Chicken.src = "ChickenR1.5.gif"; FH.src = "FarmerHead1.5.gif"}
+        if (125<=Temp && Temp<188) {Chicken.src = "ChickenR2.gif"; FH.src = "FarmerHead2.gif"}
+        if (188<=Temp && Temp<250) {Chicken.src = "ChickenR2.5.gif"; FH.src = "FarmerHead2.5.gif"}
+        if (250<=Temp && Temp<313) {Chicken.src = "ChickenR3.gif"; FH.src = "FarmerHead3.gif"}
+        if (313<=Temp && Temp<375) {Chicken.src = "ChickenR2.5.gif"; FH.src = "FarmerHead2.5.gif"}
+        if (375<=Temp && Temp<438) {Chicken.src = "ChickenR2.gif"; FH.src = "FarmerHead2.gif"}
+        if (438<=Temp && Temp<500) {Chicken.src = "ChickenR1.5.gif"; FH.src = "FarmerHead1.5.gif"}
+        if (500<=Temp && Temp<563) {Chicken.src = "ChickenR1.gif"; FH.src = "FarmerHead1.gif"}
+        if (563<=Temp && Temp<625) {Chicken.src = "ChickenR1.5.gif"; FH.src = "FarmerHead1.5.gif"}
+        if (625<=Temp && Temp<688) {Chicken.src = "ChickenR2.gif"; FH.src = "FarmerHead2.gif"}
+        if (688<=Temp && Temp<750) {Chicken.src = "ChickenR2.5.gif"; FH.src = "FarmerHead2.5.gif"}
+        if (750<=Temp && Temp<813) {Chicken.src = "ChickenR3.gif"; FH.src = "FarmerHead3.gif"}
+        if (813<=Temp && Temp<875) {Chicken.src = "ChickenR2.5.gif"; FH.src = "FarmerHead2.5.gif"}
+        if (875<=Temp && Temp<938) {Chicken.src = "ChickenR2.gif"; FH.src = "FarmerHead2.gif"}
+        if (938 <= Temp) {Chicken.src = "ChickenR1.5.gif"; FH.src = "FarmerHead1.5.gif"}
            };
 
       if (Minute[Minute.length-1] == "0") {     
-        if (DATE.getMilliseconds() < 50) {Logo.src = "Logo1.gif"}
-        if (50<=DATE.getMilliseconds()&&DATE.getMilliseconds()<100) {Logo.src = "Logo2.gif"}
-        if (100<=DATE.getMilliseconds()&&DATE.getMilliseconds()<150) {Logo.src = "Logo3.gif"} 
-        if (150<=DATE.getMilliseconds()&&DATE.getMilliseconds()<200) {Logo.src = "Logo4.gif"}   
-        if (200<=DATE.getMilliseconds()&&DATE.getMilliseconds()<250) {Logo.src = "Logo5.gif"} 
-        if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<300) {Logo.src = "Logo6.gif"}
-        if (300<=DATE.getMilliseconds()&&DATE.getMilliseconds()<350) {Logo.src = "Logo7.gif"}
-        if (350<=DATE.getMilliseconds()&&DATE.getMilliseconds()<400) {Logo.src = "Logo8.gif"}
-        if (400<=DATE.getMilliseconds()&&DATE.getMilliseconds()<450) {Logo.src = "Logo9.gif"}
-        if (450<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {Logo.src = "Logo10.gif"}
-        if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<550) {Logo.src = "Logo11.gif"}
-        if (550<=DATE.getMilliseconds()&&DATE.getMilliseconds()<600) {Logo.src = "Logo12.gif"}
-        if (600<=DATE.getMilliseconds()&&DATE.getMilliseconds()<650) {Logo.src = "Logo13.gif"}
-        if (650<=DATE.getMilliseconds()&&DATE.getMilliseconds()<700) {Logo.src = "Logo14.gif"}
-        if (700<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {Logo.src = "Logo15.gif"}
-        if (750<=DATE.getMilliseconds()&&DATE.getMilliseconds()<800) {Logo.src = "Logo16.gif"}
-        if (DATE.getMilliseconds() >= 800) {Logo.src = "Logo1.gif"}
+        if (Temp < 50) {Logo.src = "Logo1.gif"}
+        if (50<=Temp&&Temp<100) {Logo.src = "Logo2.gif"}
+        if (100<=Temp&&Temp<150) {Logo.src = "Logo3.gif"} 
+        if (150<=Temp&&Temp<200) {Logo.src = "Logo4.gif"}   
+        if (200<=Temp&&Temp<250) {Logo.src = "Logo5.gif"} 
+        if (250<=Temp&&Temp<300) {Logo.src = "Logo6.gif"}
+        if (300<=Temp&&Temp<350) {Logo.src = "Logo7.gif"}
+        if (350<=Temp&&Temp<400) {Logo.src = "Logo8.gif"}
+        if (400<=Temp&&Temp<450) {Logo.src = "Logo9.gif"}
+        if (450<=Temp&&Temp<500) {Logo.src = "Logo10.gif"}
+        if (500<=Temp&&Temp<550) {Logo.src = "Logo11.gif"}
+        if (550<=Temp&&Temp<600) {Logo.src = "Logo12.gif"}
+        if (600<=Temp&&Temp<650) {Logo.src = "Logo13.gif"}
+        if (650<=Temp&&Temp<700) {Logo.src = "Logo14.gif"}
+        if (700<=Temp&&Temp<750) {Logo.src = "Logo15.gif"}
+        if (750<=Temp&&Temp<800) {Logo.src = "Logo16.gif"}
+        if (Temp >= 800) {Logo.src = "Logo1.gif"}
                                           };
 
       ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
@@ -1545,17 +2052,22 @@
       for (let r = 0; r < 4; r++) {MRmx[r] -= 5; if (MRmx[r] <= -100) {MRmx[r] += 1200};
                                    ctx.drawImage(MRmI[r], MRmx[r], 475, 300, 30)        };
       ctx.drawImage(Truck, Truck_x, 0, 1050, 450);                             
-      ctx.drawImage(Farmer, 0, 50, 500, 500); ctx.drawImage(FH, 90, 35, 300, 250);
+      ctx.drawImage(Farmer, 0, 50, 500, 500); ctx.drawImage(FH, 110, 50, 230, 250);
       ctx.drawImage(Chicken, Chicken_x, 330, 200, 200); 
 
       if (Number(Minute[Minute.length-1]) < 5) 
-        {ctx.globalAlpha = (Number(Minute[Minute.length-1]) / 10) + (DATE.getMilliseconds() / 10000)}
-      else {ctx.globalAlpha = (10-Number(Minute[Minute.length-1])-(DATE.getMilliseconds()/1000))/10};
+        {Phase = (Number(Minute[Minute.length-1]) / 10) + (Temp / 10000)}
+      else {Phase = (10-Number(Minute[Minute.length-1])-(Temp/1000))/10};
+      ctx.globalAlpha = Phase;
       ctx.font = "30px Arial"; ctx.fillStyle = "aqua";
-      ctx.fillText("Version Date: 23 Nov 2023", 310, 550); ctx.globalAlpha = 1;
+      ctx.fillText("Version Date: 11 Apr 2024", 310, 550); ctx.globalAlpha = 1;
 
-      ctx.drawImage(Logo, 100, 10, 800, 70);
-      ctx.drawImage(Label, 275, 75, 483, 62);
+      ctx.drawImage(Logo, 150-400*(Temp/5000), 10-35*(Temp/5000), 800*(1+(Temp-500)/5000), 70*(1+(Temp-500)/5000));
+      ctx.translate(512, 110);
+      ctx.rotate((Phase-0.25)*Math.PI/2);
+      ctx.drawImage(Label, -242, -31, 484, 62);
+      ctx.rotate((0.25-Phase)*Math.PI/2);
+      ctx.translate(-512, -110);
 
       if (Clouds_x < -1976) {Clouds_x++} else {Clouds_x -= 3000};
       if (MHx > -1200) {MHx -= 0.5} else {MHx += 2200};
@@ -1563,18 +2075,53 @@
       if (Chicken_x == 800) {Dash = false} if (Chicken_x == 350) {Dash = true};
       if (Dash) {Chicken_x += 5} else {Chicken_x--};
 
-      canvas.onclick = [];
       Spawn = []; Ground = []; Platform = []; Obstacle = []; Duck = []; Pigeon = []; 
       Water = []; Apparition = []; Predator = []; MapSpec = []; Map = [];
-      setTimeout(() => {ctx.fillStyle = "red";
+
+      if (MINUTE < 10) {
+        HexR = Math.round(250).toString(16); 
+        HexG = Math.round(25*MINUTE).toString(16); 
+        HexB = Math.round(0).toString(16)
+                       }
+      if (10 <= MINUTE && MINUTE < 20) {
+        HexR = Math.round(250 - 25*(MINUTE - 10)).toString(16); 
+        HexG = Math.round(250).toString(16); 
+        HexB = Math.round(0).toString(16)
+                                       }
+      if (20 <= MINUTE && MINUTE < 30) {
+        HexR = Math.round(0).toString(16); 
+        HexG = Math.round(250).toString(16); 
+        HexB = Math.round(25*(MINUTE - 20)).toString(16)
+                                       } 
+      if (30 <= MINUTE && MINUTE < 40) {
+        HexR = Math.round(0).toString(16); 
+        HexG = Math.round(250 - 25*(MINUTE - 30)).toString(16); 
+        HexB = Math.round(250).toString(16)
+                                       }
+      if (40 <= MINUTE && MINUTE < 50) {
+        HexR = Math.round(25*(MINUTE - 40)).toString(16); 
+        HexG = Math.round(0).toString(16); 
+        HexB = Math.round(250).toString(16)
+                                       }
+      if (50 <= MINUTE && MINUTE < 60) {
+        HexR = Math.round(250).toString(16); 
+        HexG = Math.round(0).toString(16); 
+        HexB = Math.round(250 - 25*(MINUTE - 50)).toString(16)
+                                       };
+      if (HexR.length == 1) {HexR = "0" + HexR}
+      if (HexG.length == 1) {HexG = "0" + HexG}
+      if (HexB.length == 1) {HexB = "0" + HexB};                                                                                                                                                                                                                                                             
+      HexT = "#" + HexR + HexG + HexB;
+
+      setTimeout(() => {ctx.fillStyle = HexT;
         ctx.fillText("Click here to play", 380, 300);
-        canvas.onclick = function() {Level = 1; LevelLoad(); 
-          Map = JSON.parse(JSON.stringify(MapSpec));
-          x_b = JSON.parse(JSON.stringify(X_b1)); 
-          y_b = JSON.parse(JSON.stringify(Y_b1)); 
-          Player.x = Map[0].x; Player.y = Map[0].y; Player.Lives = 5; Player.Stamina = 5;
-          Player.width = 20; Player.height = 20; Player.Active = true; ReverseT = 1000;
-          Game = "On"               }
+        canvas.onclick = () => {if (Game == "Off") {
+            Level = 1; LevelLoad(); Map = JSON.parse(JSON.stringify(MapSpec)); 
+            x_b = JSON.parse(JSON.stringify(X_b1)); y_b = JSON.parse(JSON.stringify(Y_b1)); 
+            Player.x = Map[0].x; Player.y = Map[0].y; Player.Lives = 5; Player.Stamina = 5;
+            Player.width = 20; Player.height = 20; Player.Active = true; ReverseT = 1000;
+            Game = "On"                            }     
+                               }
                        }, 3000)};
 
     if (Level == 1 && Player.Lives < 0) {Game = "Over"; // Oh no! <;-(
@@ -1613,7 +2160,16 @@
         ctx.fillText("Click to return to menu", 360, 300);
         canvas.onclick = function() {Level = 0; Game = "Off"; UserName = prompt("Name your avatar")}
                             }, 3000)};                        
-                    
+    
+    if (Level == 4 && SceneL4 == 57) {Game = "Over"; // To be continued, not anytime soon though...
+      ctx.clearRect(0, 0, canvas.width, canvas.height); canvas.onclick = [];
+      Screen.src = "ToBeContinued.jpg";
+      ctx.drawImage(Screen, 0, 0, canvas.width, canvas.height);
+      setTimeout(function() {ctx.font = "30px Arial"; ctx.fillStyle = "black";
+        ctx.fillText("Click to return to menu", 360, 300);
+        canvas.onclick = function() {Level = 0; Game = "Off"; UserName = prompt("Name your avatar")}
+                            }, 3000) };                        
+
     if (Level == 5) {
       if (Player.x - Map[1][0].x > 9900) {Game = "Over"; // Thanks for playing
       ctx.clearRect(0, 0, canvas.width, canvas.height); canvas.onclick = [];
@@ -1650,29 +2206,33 @@
   const Clock = new Image(); Clock.src = "Clock.gif";
   
   function Proximity() {// When the player is close to capture
-    if (((Level == 1 || Level == 4 || Level == 6 || Level == 7) && Player.x - Map[8][0].x < 500)) 
+    if (((Level == 1 || Level == 4 || Level == 6 || Level == 7) && Player.x - Map[8][0].x < 500) &&
+        Player.Active) 
       {Player.Surprised = true} else {Player.Surprised = false}
                        };
 
   var FreezeFrame = new Image(); FreezeFrame.src = "FreezeFrame1.gif"
 
   function RenderPause() {
-    if (DATE.getMilliseconds() < 125) {FreezeFrame.src = "FreezeFrame1.gif"}
-    if (125<=DATE.getMilliseconds()&&DATE.getMilliseconds()<250) {FreezeFrame.src="FreezeFrame2.gif"}
-    if (250<=DATE.getMilliseconds()&&DATE.getMilliseconds()<375) {FreezeFrame.src="FreezeFrame3.gif"}
-    if (375<=DATE.getMilliseconds()&&DATE.getMilliseconds()<500) {FreezeFrame.src="FreezeFrame2.gif"}
-    if (500<=DATE.getMilliseconds()&&DATE.getMilliseconds()<625) {FreezeFrame.src="FreezeFrame1.gif"}
-    if (625<=DATE.getMilliseconds()&&DATE.getMilliseconds()<750) {FreezeFrame.src="FreezeFrame2.gif"}
-    if (750<=DATE.getMilliseconds()&&DATE.getMilliseconds()<875) {FreezeFrame.src="FreezeFrame3.gif"}
-    if (DATE.getMilliseconds() >= 875) {FreezeFrame.src="FreezeFrame2.gif"}
+    if (Temp < 125) {FreezeFrame.src = "FreezeFrame1.gif"}
+    if (125<=Temp&&Temp<250) {FreezeFrame.src="FreezeFrame2.gif"}
+    if (250<=Temp&&Temp<375) {FreezeFrame.src="FreezeFrame3.gif"}
+    if (375<=Temp&&Temp<500) {FreezeFrame.src="FreezeFrame2.gif"}
+    if (500<=Temp&&Temp<625) {FreezeFrame.src="FreezeFrame1.gif"}
+    if (625<=Temp&&Temp<750) {FreezeFrame.src="FreezeFrame2.gif"}
+    if (750<=Temp&&Temp<875) {FreezeFrame.src="FreezeFrame3.gif"}
+    if (Temp >= 875) {FreezeFrame.src="FreezeFrame2.gif"}
 
     ctx.globalAlpha = 0.75;
     ctx.drawImage(FreezeFrame, 0, 0, 1024, 576);
     ctx.globalAlpha = 1
-                         };                    
+                         };
+                         
+  var Distance;                        
 
-  function loop() {DATE = new Date(); // Required for animation frame switching
-    Minute = DATE.getSeconds().toString();
+  function loop() {Temp = new Date().getMilliseconds(); // Required for animation frame switching
+    if (Game == "Off" || Level == 7) {Minute = new Date().getSeconds().toString();
+                                      MINUTE = new Date().getSeconds() + Temp/1000};
     if (UserName == null) {UserName = prompt("I'm not going away until you name me!")};
     if (UserName.length == 0) {UserName = prompt("No name? Enter a name damnit!")};
     if (UserName.length > 20) {UserName = prompt("Too long, enter a shorter name!")};
@@ -1681,27 +2241,29 @@
     if (Game == "On") {
       if (keys.pause == false) {
         ImageLoad(); ImageFlip(); if (Level != 7) {MobMotion()};
-        PlayerMotion(); ScrollConditions(); ScrollFunction(); Collision();              
+        if (Level != 4) {PlayerMotion()} else {Glide(); Snatch()}; 
+        ScrollConditions(); ScrollFunction(); Collision();              
       
         if (Player.Active == false) {keys.left = false; keys.right = false};
     
         if (Level == 1 || Level == 4 || Level == 6 || Level == 7) {Sweep()};
                                };
 
-      Reverse();                         
+      if (Level != 3 && Level != 7) {Reverse()};                         
 
       // Rendering the canvas, the player, the platforms and the obstacles
-      BackgroundLoad(); RenderCanvas(); 
+      BackgroundLoad(); ForegroundLoad(); RenderCanvas(); 
       if (Level != 3) {RenderMap(); 
         if (Level == 7) {
           if (Number(Minute[Minute.length-1]) < 5) 
-            {ctx.globalAlpha=(Number(Minute[Minute.length-1])/10)+(DATE.getMilliseconds()/10000)}
-          else {ctx.globalAlpha=(10-Number(Minute[Minute.length-1])-(DATE.getMilliseconds()/1000))/10};
+            {ctx.globalAlpha=(Number(Minute[Minute.length-1])/10)+(Temp/10000)}
+          else {ctx.globalAlpha=(10-Number(Minute[Minute.length-1])-(Temp/1000))/10};
           ctx.drawImage(ReaperHead, Map[4][0].x + 332, 104, 59, 115); ctx.globalAlpha = 1};
         if (Level == 7 && (Chicken.src.includes("D5") || Chicken.src.includes("D6"))) 
           {RenderGhost()}; 
         RenderPlayer()}
-      else {RenderPlayer(); RenderMap()} 
+      else {RenderPlayer(); RenderMap()}
+      if (Level == 4) {RenderFore()}; 
                              
     
       // Gamestate
@@ -1711,17 +2273,28 @@
       Message(); if (Level == 1 || Level == 4 || Level == 6) {Proximity()};
 
       // Displaying the stamina and lives
-      ctx.drawImage(Icon[0], 10, 10, 100, 60); ctx.drawImage(Icon[1], 450, 10, 60, 60);
+      if (Level != 4) {Icon[0].src = "Stamina.gif"; ctx.drawImage(Icon[0], 10, 10, 100, 60)}
+      else {if (Player.Active) {Icon[0].src = "EagleHead.gif";
+             ctx.drawImage(Icon[0], 350 - (Player.x - Map[8][0].x)/100, 0, 128, 94)
+                               }
+            else {if (SceneL4 > 0) {ctx.drawImage(Icon[0], 900, 220, 100, 100)}}
+           };
+      ctx.drawImage(Icon[1], 450, 10, 60, 60);
       if (Level == 3) {ctx.drawImage(Clock, 250, 0, 100, 100)};
       ctx.font = "30px Arial"; 
       if (Level == 1) {ctx.fillStyle = "black"; level = "1 - Farm"}; 
       if (Level == 2) {ctx.fillStyle = "white"; level = "2 - Sewer"};
       if (Level == 3) {ctx.fillStyle = "turquoise"; level = "3 - Desert"};
-      if (Level == 4) {ctx.fillStyle = "lime"; level = "2 - Sky"};
+      if (Level == 4) {ctx.fillStyle = "blue"; level = "2 - Sea"};
       if (Level == 5) {ctx.fillStyle = "orange"; level = "3 - Beach"};
       if (Level == 6) {ctx.fillStyle = "pink"; level = "3 - Off-Grid"};
       if (Level == 7) {ctx.fillStyle = "lightgrey"; level = "4 - Taiga"};
-      ctx.fillText("X " + Player.Stamina, 100, 50); 
+
+      if (Level != 4) {ctx.fillText("X " + Player.Stamina, 100, 50)} else {ctx.fillStyle = Hex4;
+        if (Player.x < Map[2][1].x || Player.jump) 
+        {Distance = String(Math.round(Player.x - Map[8][0].x))};
+                                                   ;
+        ctx.fillText(Distance, 450, 100); ctx.fillStyle = "blue"          }; 
       ctx.fillText("X " + Player.Lives, 500, 50);
       ctx.fillText("Level: " + level, 750, 50);
     
