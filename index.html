@@ -1,30 +1,79 @@
 <!DOCTYPE html>
 <html lang="en-GB">
  <head>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-KVPZS5DW');</script>
-    <!-- End Google Tag Manager -->
     <meta charset="utf-8" />
-    <title>Video Game</title>                            <!--Page title, invisible on browser page-->
-    <link rel="stylesheet" href="styles.css" />                 <!--Reference to external CSS file-->
+
+    <meta name = "description" content = "Play Chicken Crossing — a free 2-D platform game">
+
+    <meta name = "keywords" content = "video game, chicken crossing, browser game, HTML5 game, rooster, farm escape">
+
+    <meta name = "author" content = "Patrick Rolincin Bambi">
+
+    <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph for social sharing -->
+    <meta property = "og:title" content = "Chicken Crossing Video Game">
+    <meta property = "og:description" content = "A web-based 2-D platform adventure where a rebellious rooster flees the farm, only to 
+                                                 realise that life on the outside brings its own set of dangers."                     >
+    <meta property = "og:image" content = "https://p-r-b.github.io/Video_Game/Banner.gif">
+    <meta property = "og:type" content = "website">
+    <meta property = "og:url" content = "https://p-r-b.github.io/Video_Game/">
+
+    <!-- Twitter Card -->
+    <meta name = "twitter:card" content = "summary_large_image">
+    <meta name = "twitter:title" content = "Chicken Crossing Video Game">
+    <meta name = "twitter:description" content = "A web-based 2-D platform adventure where a rebellious rooster flees the farm, only to 
+                                                  realise that life on the outside brings its own set of dangers."                     >
+    <meta name = "twitter:image" content = "https://p-r-b.github.io/Video_Game/Banner.gif">
+
+
+    <!-- Open Graph Video -->
+    <meta property = "og:video" content = "https://www.youtube.com/embed/7x8xMXItH_g">
+    <meta property = "og:video:width" content = "1024">
+    <meta property = "og:video:height" content = "576">
+    <meta property = "og:video:type" content = "text/html">
+
+    <!-- Twitter Card Video -->
+    <meta name = "twitter:card" content = "player">
+    <meta name = "twitter:title" content = "Chicken Crossing - Gameplay Walkthrough">
+    <meta name = "twitter:description" content = "Watch the official Chicken Crossing gameplay demo — a browser-based 2-D platform game.">
+    <meta name = "twitter:image" content = "https://p-r-b.github.io/Video_Game/Banner.gif">
+    <meta name = "twitter:player" content = "https://www.youtube.com/embed/7x8xMXItH_g">
+    <meta name = "twitter:player:width" content = "1024">
+    <meta name = "twitter:player:height" content = "576">
+
+    <title>Chicken Crossing Video Game</title>                            <!--Page title, invisible on browser page-->
+    <link rel = "stylesheet" href = "styles.css" />                 <!--Reference to external CSS file-->
  </head>
 
  <body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KVPZS5DW"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
   <header>                                                 <!--Page title, visible on browser page-->
-   <h1>
-    <div class = "Line">                                    
-     <div class = "HeadCell1">Video Game</div> 
-     <div class = "HeadCell2"><img src = "Banner.gif"; title = "Chicken Crossing logo banner"/></div>
+   <div class = "HeadBox" itemscope itemtype = "http://schema.org/VideoGame">
+    <h1 itemprop = "name"><strong>Chicken Crossing -</strong> The Video Game</h1>
+
+    <div class = "Line">
+      <div class = "HeadCell1">
+        <meta itemprop = "genre" content = "Arcade" />
+        <img src = "PRB DM.gif" alt = "PRB Digital Marketing logo as found on the official YouTube channel" itemprop = "image" />
+      </div>
+      <div class = "HeadCell2">
+        <img src = "Banner.gif" alt = "Chicken Crossing logo banner" itemprop = "image" />
+      </div>
     </div>
-   </h1>                                     
+
+    <meta itemprop = "author" content = "Patrick Rolincin Bambi" />
+    <meta itemprop = "operatingSystem" content = "Web browser" />
+    <meta itemprop = "applicationCategory" content = "Game" />
+    <meta itemprop = "gamePlatform" content = "Web" />
+    <meta itemprop = "url" content = "https://p-r-b.github.io/Video_Game/" />
+    <meta itemprop = "inLanguage" content = "en-GB" />
+    <meta itemprop = "playMode" content = "SinglePlayer" />
+
+    <p itemprop = "description">
+      A web-based 2-D platform adventure where a rebellious rooster flees the farm, only to realise that life on the outside brings its 
+      own set of dangers.
+    </p>
+  </div>                                     
   </header>
 
   <p>This game's resolution is 1024 x 576, with the 16:9 aspect ratio typically used for
@@ -57,15 +106,39 @@
      Enjoy the Game
   </p>
 
-  <p><strong><u>Notice</u></strong><br>
-     This game used to have three different endings, although that was before I added details 
-     such as animation sequences, multi-layer backgrounds and annotations to the levels. I
-     significantly underestimated the labour intensity of doing all those things, therefore that,
-     combined with my complete makeover of the desert level from the ground up, meant that I
-     had to restrict this version of the game to one ending, although it has been extended by a
-     level. There are numerous improvements that I wish to make to the alternative plots as well,
-     and I don't believe that they are ready to share in their current state, therefore I saw no
-     point in reconfiguring their algorithms to make them compatible with the updated game.
+  <p><strong><u>Update</u></strong><br>
+     Although this page has undergone an extensive makeover to improve its search engine ranking, visual appeal and accessibility, 
+     unfortunately the same cannot be said for the game itself. I consider developing my browser game further amongst the least of my 
+     priorities at the moment. Any refinements I may make to the game in future would be first qualitative (graphics, sound etc.),
+     second quantitative (additional levels). Nevertheless, it has been a monumental feat to get the game to its current state,
+     especially considering that I am working on this project alone, so enjoy it as it is for now.
+  </p>
+
+  <p><strong><u>YouTube - Let's Play</u></strong><br>
+     A walkthrough video of this game from 
+     <a href = "https://www.youtube.com/@PRBDigitalMarketing" target="_blank">my YouTube channel</a> 
+     is available below. Watch it if you're struggling to progress through the levels.
+  </p>
+
+  <div class = "Video" itemscope itemtype = "http://schema.org/VideoObject">
+    <meta itemprop = "name" content = "Chicken Crossing - Gameplay Walkthrough">
+    <meta itemprop = "description" content = "Watch the official Chicken Crossing gameplay demo — a browser-based 2-D platform game.">
+    <meta itemprop = "thumbnailUrl" content = "https://p-r-b.github.io/Video_Game/Banner.gif">
+    <meta itemprop = "uploadDate" content = "2025-05-26">
+    <meta itemprop = "embedUrl" content = "https://www.youtube.com/embed/7x8xMXItH_g">
+    <meta itemprop = "duration" content = "PT19M23S"> <!-- 19 min 23 sec -->
+    <iframe width = "1024" height = "576" src="https://www.youtube.com/embed/7x8xMXItH_g?si=4Y8lxWFBdVlj5fn_"
+            title = "Chicken Crossing - Gameplay Walkthrough" frameborder = "0"
+            allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy = "strict-origin-when-cross-origin" allowfullscreen itemprop = "contentUrl"                   >
+    </iframe>
+  </div>
+
+  <p class = Middle>
+    I conditionally grant permission for this website and game to be featured elsewhere for free, non-commercial purposes,<br>
+    provided that I am credited for my contents being used.<br><br> 
+    <strong>&copy 2025&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Patrick Rolincin Bambi
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; All Rights Reserved</strong>
   </p>
 
  </body>

@@ -1,13 +1,14 @@
-body {font-family: Arial, sans-serif; background-color: rgb(150, 200, 150)}
+body {font-family: Arial, sans-serif; background: linear-gradient(to bottom, rgb(50, 100, 200) 5%, rgb(100, 200, 100) 20%, white 90%)}
 
-h1 {padding: 10px 10px 10px 10px; width: inherit; box-sizing: border-box; min-width: 550px;
-    -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: magenta;
-    font-size: 3em; color: white; 
-    background: linear-gradient(to right, black 30%, magenta 90%)                       } 
+.HeadBox {padding: 10px 10px 10px 10px; width: inherit; box-sizing: border-box; min-width: 550px;
+    color: white; background: linear-gradient(to right, black 30%, magenta 90%)           } 
+
+.HeadBox h1 {font-size: 3em; -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: magenta}   
     
-h1 img {max-width: 100%}    
+.HeadBox img {max-width: 100%}  
+.HeadBox p {font-size: 1em}
     
-.HeadCell1 {width: 300px} 
+.HeadCell1 {width: 150px} 
 .HeadCell2 {width: 700px}
 
 .Line {display: flex; flex-direction: row; justify-content: space-between;
@@ -18,3 +19,7 @@ h1 img {max-width: 100%}
         background-color: aquamarine; position: relative;                                 }
 
 p {margin-left: 10px; margin-right: 10px}
+
+.Video {max-width: 1024px; height: 576px; margin: auto}
+
+.Middle {text-align: center}
