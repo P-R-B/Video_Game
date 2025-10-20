@@ -22,4 +22,6 @@ p {margin-left: 10px; margin-right: 10px}
 
 .Video {max-width: 1024px; height: 576px; margin: auto}
 
+button {display: block; margin: auto}
+
 .Middle {text-align: center}
